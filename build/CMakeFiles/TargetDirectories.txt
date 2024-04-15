@@ -1,0 +1,3 @@
+/home/nail/work/TestProjs/sphere/build/CMakeFiles/rebuild_cache.dir
+/home/nail/work/TestProjs/sphere/build/CMakeFiles/sphere.dir
+/home/nail/work/TestProjs/sphere/build/CMakeFiles/edit_cache.dir
