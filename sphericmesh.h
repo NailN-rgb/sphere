@@ -1,24 +1,36 @@
 #pragma once
 
-double degrees_to_radians(double deg)
+value_type degrees_to_radians(value_type deg)
 {
     return deg * 4. * std::atan(1.) / 180;
 }
 
-
-polygon get_semi_circle(point pw, double radius, int point_count = 10)
+/**
+ * That code creates a seci-circle to use in circle points mesh builder
+ * @param pw center of a circle
+ * @param radius radius of a circle
+ * @param point_count number of a points at circle, may be used to increase a interpolation quality
+*/
+polygon get_semi_circle(
+    point pw, 
+    value_type radius, 
+    index_type point_count = 10
+)
 {
+    // create polygon that after we fill
     polygon semi_circle;
 
+    // append the polar point to polygon
     bg::append(semi_circle, point(bg::get<0>(pw), bg::get<1>(pw) - radius));
 
     // create semi-circle points 
     for(int i = 1; i <= point_count; ++i)
     {
-        double angle = degrees_to_radians(90 - 90 / point_count * i);
+        value_type angle = degrees_to_radians(90 - 90 / point_count * i);
         bg::append(semi_circle, point(bg::get<0>(pw) + radius * cos(angle), bg::get<1>(pw) - radius * sin(angle)));
     }
 
+    // append circle center to polygon
     bg::append(semi_circle, point(bg::get<0>(pw), bg::get<1>(pw)));
 
     // append last point to polygon
@@ -73,7 +85,12 @@ point get_intersect(polygon pgn, segment line)
 }
 
 // точки в points должны идти в пордке убывания координаты х 
-vector_of_points get_sphere_approx(vector_of_points &points, point pw, double lw, double radius, bool is_up)
+vector_of_points get_sphere_approx(
+    const vector_of_points &points,
+    point pw,
+    value_type lw,
+    value_type radius,
+    bool is_up)
 {
     vector_of_points result;
 
@@ -84,7 +101,7 @@ vector_of_points get_sphere_approx(vector_of_points &points, point pw, double lw
         )
     );
     
-   polygon circle = get_semi_circle(pw, radius);
+    polygon circle = get_semi_circle(pw, radius);
 
 
     for(auto pt : points)

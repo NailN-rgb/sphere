@@ -2,7 +2,7 @@
 
 std::vector<point3d> well_trajectory(double zw, double lw, int points_count, double radius)
 {
-    points_vector well_seg = get_cylinder_mesh(zw, lw, points_count, radius);
+    vector_of_points well_seg = get_cylinder_mesh(zw, lw, points_count, radius);
 
     std::vector<point3d> result;
 

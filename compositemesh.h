@@ -1,13 +1,27 @@
 #pragma once
 
-
-points_vector get_cylinder_mesh(double zw, double lw, int points_count, double radius)
+/**
+    * Generation of a cylinder mesh
+    * @param zw well centers depth
+    * @param lw well length
+    * @param points_count the number of points at cylinder
+    * @param radius the radius of cylinder
+    * 
+    * @return vector of points
+    * 
+    * @throws None
+*/
+vector_of_points get_cylinder_mesh(
+    value_type zw,
+    value_type lw,
+    index_type points_count,
+    value_type radius
+)
 {
     // regular mesh
+    value_type h = lw / (points_count - 1);
 
-    double h = lw / (points_count - 1);
-
-    points_vector cylinder_mesh;
+    vector_of_points cylinder_mesh;
 
     for(size_t i = 0; i < points_count; i++)
     {
@@ -23,15 +37,16 @@ points_vector get_cylinder_mesh(double zw, double lw, int points_count, double r
 }
 
 
-std::vector<point3d> make_composite_mesh(
-    double zw,
-    double lw,
-    double circle_radius,
-    double layer_height,
-    vector_of_points lgr_points,
-    int segments,
-    int cylinder_count,
-    int mesh_count
+
+mesh_points_vector make_composite_mesh(
+    value_type zw,
+    value_type lw,
+    value_type circle_radius,
+    value_type layer_height,
+    const vector_of_points &lgr_points,
+    index_type segments,
+    index_type cylinder_count,
+    index_type mesh_count
 )
 {
     // first create semi circle by params

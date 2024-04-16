@@ -18,6 +18,10 @@ typedef bg::model::polygon<point> polygon;
 typedef bg::model::segment<point> segment;
 
 
+typedef double value_type;
+typedef int index_type;
+typedef size_t size_type;
+
 typedef std::vector<point3d> mesh_points_vector;
 typedef std::vector<point> vector_of_points;
 typedef std::vector<std::vector<double>> elements_vector;
