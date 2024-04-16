@@ -1,23 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/algorithms/for_each.hpp>
-#include <boost/geometry/algorithms/intersection.hpp>
-
-#include <iostream>
-#include <deque>
-
-namespace bg = boost::geometry;
-typedef bg::model::point<double, 2, bg::cs::cartesian> point;
-typedef bg::model::point<double, 3, bg::cs::cartesian> point3d;
-typedef bg::model::polygon<point> polygon;
-typedef bg::model::segment<point> segment;
-
-
-
 double degrees_to_radians(double deg)
 {
     return deg * 4. * std::atan(1.) / 180;
@@ -73,7 +55,7 @@ point get_intersect(polygon pgn, segment line)
         // if intersects
         if(bg::intersects(polygon_seg, line))
         {
-            std::vector<point> res;
+            vector_of_points res;
 
             bg::intersection(polygon_seg, line, res);
 
@@ -91,9 +73,9 @@ point get_intersect(polygon pgn, segment line)
 }
 
 // точки в points должны идти в пордке убывания координаты х 
-std::vector<point> get_sphere_approx(std::vector<point> &points, point pw, double lw, double radius, bool is_up)
+vector_of_points get_sphere_approx(vector_of_points &points, point pw, double lw, double radius, bool is_up)
 {
-    std::vector<point> result;
+    vector_of_points result;
 
     result.push_back(
         bg::make<point>(
@@ -112,12 +94,12 @@ std::vector<point> get_sphere_approx(std::vector<point> &points, point pw, doubl
         result.push_back(get_intersect(circle, line));
     }
 
-    result.push_back(
-        bg::make<point>(
-            bg::get<0>(pw) + radius,
-            bg::get<1>(pw)
-        )
-    );
+    // result.push_back(
+    //     bg::make<point>(
+    //         bg::get<0>(pw) + radius,
+    //         bg::get<1>(pw)
+    //     )
+    // );
     
     if(!is_up)
     {

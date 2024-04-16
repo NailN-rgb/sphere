@@ -7,24 +7,30 @@
 #IncludeRegexTransform: 
 
 /home/nail/work/TestProjs/sphere/compositemesh.h
-outputmesh.h
-/home/nail/work/TestProjs/sphere/outputmesh.h
-rotatemesh.h
-/home/nail/work/TestProjs/sphere/rotatemesh.h
-sphericmesh.h
-/home/nail/work/TestProjs/sphere/sphericmesh.h
+
+/home/nail/work/TestProjs/sphere/createmesh.h
+
+/home/nail/work/TestProjs/sphere/elementsaseemble.h
 
 /home/nail/work/TestProjs/sphere/main.cpp
-outputmesh.h
-/home/nail/work/TestProjs/sphere/outputmesh.h
-rotatemesh.h
-/home/nail/work/TestProjs/sphere/rotatemesh.h
+precompile.h
+/home/nail/work/TestProjs/sphere/precompile.h
 sphericmesh.h
 /home/nail/work/TestProjs/sphere/sphericmesh.h
+rotatemesh.h
+/home/nail/work/TestProjs/sphere/rotatemesh.h
 compositemesh.h
 /home/nail/work/TestProjs/sphere/compositemesh.h
+createmesh.h
+/home/nail/work/TestProjs/sphere/createmesh.h
+elementsaseemble.h
+/home/nail/work/TestProjs/sphere/elementsaseemble.h
+outputmesh.h
+/home/nail/work/TestProjs/sphere/outputmesh.h
 
 /home/nail/work/TestProjs/sphere/outputmesh.h
+
+/home/nail/work/TestProjs/sphere/precompile.h
 cmath
 -
 fstream
@@ -45,40 +51,6 @@ deque
 -
 
 /home/nail/work/TestProjs/sphere/rotatemesh.h
-sphericmesh.h
-/home/nail/work/TestProjs/sphere/sphericmesh.h
-cmath
--
-boost/geometry.hpp
--
-boost/geometry/geometries/point_xy.hpp
--
-boost/geometry/geometries/polygon.hpp
--
-boost/geometry/algorithms/for_each.hpp
--
-boost/geometry/algorithms/intersection.hpp
--
-iostream
--
-deque
--
 
 /home/nail/work/TestProjs/sphere/sphericmesh.h
-cmath
--
-boost/geometry.hpp
--
-boost/geometry/geometries/point_xy.hpp
--
-boost/geometry/geometries/polygon.hpp
--
-boost/geometry/algorithms/for_each.hpp
--
-boost/geometry/algorithms/intersection.hpp
--
-iostream
--
-deque
--
 

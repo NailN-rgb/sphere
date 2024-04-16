@@ -1,22 +1,5 @@
 #pragma once
 
-#include <cmath>
-#include <fstream>
-#include <boost/geometry.hpp>
-#include <boost/geometry/geometries/point_xy.hpp>
-#include <boost/geometry/geometries/polygon.hpp>
-#include <boost/geometry/algorithms/for_each.hpp>
-#include <boost/geometry/algorithms/intersection.hpp>
-
-#include <iostream>
-#include <deque>
-
-namespace bg = boost::geometry;
-typedef bg::model::point<double, 2, bg::cs::cartesian> point;
-typedef bg::model::point<double, 3, bg::cs::cartesian> point3d;
-typedef bg::model::polygon<point> polygon;
-typedef bg::model::segment<point> segment;
-
 
 void print3d_mesh(std::vector<point3d> pts)
 {
@@ -30,13 +13,29 @@ void print3d_mesh(std::vector<point3d> pts)
 }
 
 
+int get_elems_size(std::vector<std::vector<double>> elems)
+{
+    int size = 0;
+
+    for(auto elem : elems)
+    {
+        size += elem.size();
+    }
+
+    return size;
+}
+
+
 void write_mesh_data(std::ofstream stream, std::vector<point3d> mesh)
 {
     
 }
 
 
-void form_vtk_file(std::vector<point3d> pts)
+void form_vtk_file(
+    std::vector<point3d> pts, 
+    std::vector<std::vector<double>> elems
+)
 {
     std::ofstream file;
 
@@ -45,6 +44,7 @@ void form_vtk_file(std::vector<point3d> pts)
     if(file.is_open())
     {
         size_t points_count = pts.size();
+        size_t elems_count  = elems.size();
 
         int vtk_mesh_type = 2;
 
@@ -59,18 +59,47 @@ void form_vtk_file(std::vector<point3d> pts)
             file << float(bg::get<0>(pts[i])) << "\t" << float(bg::get<1>(pts[i])) << "\t" << float(bg::get<2>(pts[i])) << std::endl;
         }
 
-        file << "CELLS " << points_count << "\t" << points_count * 2 << std::endl;
+        file << "CELLS " << points_count + elems_count << "\t" << 2 * points_count + elems_count + get_elems_size(elems) << std::endl;
 
         for(size_t i = 0; i < points_count; i++)
         {
             file << 1 << "\t" << i << std::endl;
         }
 
-        file << "CELL_TYPES " << points_count << std::endl;
+        for(size_t i = 0; i < elems_count; i++)
+        {
+            file << elems[i].size() << "\t";
+            
+            for(auto idx : elems[i])
+            {
+                file << idx << '\t'; 
+            }
+
+            file << std::endl;
+        }
+
+
+        file << "CELL_TYPES " << points_count + elems_count << std::endl;
 
         for(size_t i = 0; i < points_count; i++)
         {
             file << 2 << std::endl;
+        }
+
+        for(size_t i = 0; i < elems_count; i++)
+        {
+            if(elems[i].size() == 6)
+            {
+                file << 13 << std::endl;
+            }
+            else if(elems[i].size() == 4)
+            {
+                file << 10 << std::endl;
+            }
+            else if(elems[i].size() == 5)
+            {
+                file << 14 << std::endl;
+            }
         }
 
         file.close();
