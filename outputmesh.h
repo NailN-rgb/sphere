@@ -100,6 +100,10 @@ void form_vtk_file(
             {
                 file << 14 << std::endl;
             }
+            else if(elems[i].size() == 8)
+            {
+                file << 12 << std::endl;
+            }
         }
 
         file.close();

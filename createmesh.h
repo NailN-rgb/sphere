@@ -27,14 +27,13 @@ mesh_points_vector get_mesh_nodes(
     index_type segments,
     index_type cylinder_count,
     index_type mesh_count,
-    value_type min_rad = 1,
-    value_type max_rad = 0.3
+    value_type min_rad = 0.3,
+    value_type max_rad = 3
 )
 {
     mesh_points_vector points_mesh;
 
     // get well traj
-
     vector_of_points well_points = get_cylinder_mesh(zw, lw, cylinder_count, 0);
 
     std::for_each(
@@ -61,7 +60,7 @@ mesh_points_vector get_mesh_nodes(
         std::vector<point3d> lgr_pts = make_composite_mesh(
             zw,
             lw,
-            max_rad - i * h_rad,
+            std::exp(i * (std::log(max_rad) / mesh_count)) - 1 + min_rad,
             layer_height,
             lgr_points,
             segments,

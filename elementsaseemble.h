@@ -288,6 +288,212 @@ std::vector<std::vector<double>> last_lgr_connection_with_well(
 }
 
 
+elements_vector create_between_layer_polar_connection(
+    index_type n_cyl,
+    index_type n_points,
+    index_type n_segments,
+    index_type n_side,
+    index_type n_layer,
+    index_type current_lgr_idx
+)
+{
+    elements_vector polar_elems;
+
+    /*
+        NORTH POLUS
+    */
+    for(int k = 0; k < n_segments; k++)
+    {
+        if(k < n_segments - 1)
+        {
+            std::vector<double> elem;
+
+            auto segment_offset = k * n_side;
+
+            // elem part at previous layer
+            elem.push_back(n_cyl + current_lgr_idx * n_layer);
+            elem.push_back(n_cyl + 2  + current_lgr_idx * n_layer + segment_offset);
+            elem.push_back(n_cyl + 2 + n_side  + current_lgr_idx * n_layer + segment_offset);
+
+            // elem part at next layer
+            elem.push_back(n_cyl + (current_lgr_idx + 1) * n_layer);
+            elem.push_back(n_cyl + 2  + (current_lgr_idx + 1) * n_layer + segment_offset);
+            elem.push_back(n_cyl + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset);
+
+            polar_elems.push_back(elem);
+        }
+        else
+        {
+            std::vector<double> elem;
+
+            auto segment_offset = k * n_side;
+            
+            // elem part at previous layer
+            elem.push_back(n_cyl + current_lgr_idx * n_layer);
+            elem.push_back(n_cyl + 2  + current_lgr_idx * n_layer + segment_offset);
+            elem.push_back(n_cyl + 2 + n_side  + current_lgr_idx * n_layer + segment_offset - (k + 1) * n_side);
+
+            // elem part at next layer
+            elem.push_back(n_cyl + (current_lgr_idx + 1) * n_layer);
+            elem.push_back(n_cyl + 2  + (current_lgr_idx + 1) * n_layer + segment_offset);
+            elem.push_back(n_cyl + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset - (k + 1) * n_side);
+
+            polar_elems.push_back(elem);
+        }
+    }
+
+    /*
+        SOUTH POLUS
+    */
+
+   for(int k = 0; k < n_segments; k++)
+    {
+        if(k < n_segments - 1)
+        {
+            std::vector<double> elem;
+
+            auto segment_offset = k * n_side;
+            auto polar_offset   = n_side - 1;
+
+            // elem part at previous layer
+            elem.push_back(n_cyl + 1 + current_lgr_idx * n_layer);
+            elem.push_back(n_cyl + 2  + current_lgr_idx * n_layer + segment_offset + polar_offset);
+            elem.push_back(n_cyl + 2 + n_side  + current_lgr_idx * n_layer + segment_offset + polar_offset);
+
+            // elem part at next layer
+            elem.push_back(n_cyl + 1 + (current_lgr_idx + 1) * n_layer);
+            elem.push_back(n_cyl + 2  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
+            elem.push_back(n_cyl + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
+
+            polar_elems.push_back(elem);
+        }
+        else
+        {
+            std::vector<double> elem;
+
+            auto segment_offset = k * n_side;
+            auto polar_offset   = n_side - 1;
+
+            // elem part at previous layer
+            elem.push_back(n_cyl + 1 + current_lgr_idx * n_layer);
+            elem.push_back(n_cyl + 2  + current_lgr_idx * n_layer + segment_offset + polar_offset);
+            elem.push_back(n_cyl + 2 + n_side  + current_lgr_idx * n_layer + segment_offset + polar_offset - (k + 1) * n_side );
+
+            // elem part at next layer
+            elem.push_back(n_cyl + 1 + (current_lgr_idx + 1) * n_layer);
+            elem.push_back(n_cyl + 2  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
+            elem.push_back(n_cyl + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset - (k + 1) * n_side);
+
+            polar_elems.push_back(elem);
+        }
+    }
+
+    return polar_elems;
+}
+
+
+elements_vector create_between_layer_side_connection(
+    index_type n_cyl,
+    index_type n_points,
+    index_type n_segments,
+    index_type n_side,
+    index_type n_layer,
+    index_type current_lgr_idx
+)
+{
+    elements_vector side_elements;
+
+    for(int k = 0; k < n_segments; k++)
+    {
+        if(k < n_segments - 1)
+        {
+            for(int i = 0; i < 2 * n_points + n_cyl - 1; i++)
+            {
+                std::vector<double> elem;
+
+                index_type start_offset = 2 + n_cyl;                // for first non-aroundwell capsule
+                index_type segment_offset = i;                          // offset at fixed segmnts part on capsule
+                index_type lgr_offset = k * n_side;                 // offset between segments
+                index_type capsular_ofset = current_lgr_idx * n_layer;  // offset between two capsules
+
+                // segment at previous lgr layer
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side);
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side);
+                
+
+                //segment at current layer
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer);
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer);
+
+                side_elements.push_back(elem);
+            }
+        }
+        else
+        {
+            for(int i = 0; i < 2 * n_points + n_cyl - 1; i++)
+            {
+                std::vector<double> elem;
+
+                index_type start_offset = 2 + n_cyl;                // for first non-aroundwell capsule
+                index_type segment_offset = i;                          // offset at fixed segmnts part on capsule
+                index_type lgr_offset = k * n_side;                 // offset between segments
+                index_type capsular_ofset = current_lgr_idx * n_layer;  // offset between two capsules
+
+                // segment at previous lgr layer
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset );
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side - (k + 1) * n_side);
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side - (k + 1) * n_side);
+                
+
+                //segment at current layer
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer - (k + 1) * n_side);
+                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer - (k + 1) * n_side);
+
+                side_elements.push_back(elem);
+            }
+        }
+    }
+
+    return side_elements;
+}
+
+
+elements_vector connect_with_pervious_lgr(
+    std::vector<point3d> mesh,
+    int n_cyl,
+    int n_points,
+    int n_segments,
+    index_type current_lgr_idx
+)
+{
+    // number of non polar nodes at mesh side
+    // used at adressing indexes between layer's segments
+    auto n_side = n_cyl + 2 * n_points; 
+    
+    // number of nodes at mesh layer
+    // used at adressing indexes to pervious layer nodes
+    auto n_layer = 2 + n_segments * (2 * n_points + n_cyl); 
+
+    elements_vector layer_mesh;
+
+    elements_vector polar_elems = create_between_layer_polar_connection(n_cyl, n_points, n_segments, n_side, n_layer, current_lgr_idx);
+
+    elements_vector side_elems = create_between_layer_side_connection(n_cyl, n_points, n_segments, n_side, n_layer, current_lgr_idx);
+
+    layer_mesh.insert(layer_mesh.end(), polar_elems.begin(), polar_elems.end());
+    layer_mesh.insert(layer_mesh.end(), side_elems.begin(), side_elems.end());
+
+    return layer_mesh;
+}
+
+
 std::vector<std::vector<double>> connect_elems(
     std::vector<point3d> mesh,
     int lgr_count,
@@ -296,19 +502,30 @@ std::vector<std::vector<double>> connect_elems(
     int n_segments
 )
 {
-    std::vector<std::vector<double>> elems; // we need special data type?
+    std::vector<std::vector<double>> total_elems; // we need special data type?
 
     // loop by lgr meshs
     for(size_t i = 0; i < lgr_count; i++)
     {
+        std::vector<std::vector<double>> elems;
         // if i - layer not last layer
+        if(i == 0)
+        {
+            // if i last layer -> make_connection with well
+            elems = last_lgr_connection_with_well(mesh, n_cyl, n_points, n_segments);
+        }
+        else if(i > 1) // TODO: rewrite formulas to i indx
+        {
+            elems = connect_with_pervious_lgr(mesh, n_cyl, n_points, n_segments, i - 1);
+        }
+        else //if(i == 1)
+        {
+            elems = connect_with_pervious_lgr(mesh, n_cyl, n_points, n_segments, i - 1);
+        }
+        
 
-
-        // if i last layer -> make_connection with well
-        // cut unused mwsh points
-
-        elems = last_lgr_connection_with_well(mesh, n_cyl, n_points, n_segments);
+        total_elems.insert(total_elems.end(), elems.begin(), elems.end());
     }
 
-    return elems;
+    return total_elems;
 }
