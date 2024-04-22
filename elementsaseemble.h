@@ -505,7 +505,7 @@ std::vector<std::vector<double>> connect_elems(
     std::vector<std::vector<double>> total_elems; // we need special data type?
 
     // loop by lgr meshs
-    for(size_t i = 0; i < lgr_count; i++)
+    for(size_t i = 0; i <= lgr_count; i++)
     {
         std::vector<std::vector<double>> elems;
         // if i - layer not last layer

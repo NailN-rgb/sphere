@@ -54,13 +54,13 @@ mesh_points_vector get_mesh_nodes(
     value_type h_rad = (max_rad-min_rad) / mesh_count;
 
     // loop by lgr's
-    for(size_t i = 0; i < mesh_count; i++)
+    for(size_t i = 0; i <= mesh_count; i++)
     {
         // create each lgr
         std::vector<point3d> lgr_pts = make_composite_mesh(
             zw,
             lw,
-            std::exp(i * (std::log(max_rad) / mesh_count)) - 1 + min_rad,
+            std::exp(i * (std::log(max_rad) / mesh_count)),
             layer_height,
             lgr_points,
             segments,
@@ -76,4 +76,27 @@ mesh_points_vector get_mesh_nodes(
     }
 
     return points_mesh;
+}
+
+
+mesh_points_vector get_inner_nodes(
+    value_type zw,
+    value_type lw,
+    value_type circle_radius,
+    value_type layer_height,
+    const vector_of_points &lgr_points,
+    index_type segments,
+    value_type max_rad = 3
+)
+{
+    vector_of_points inner_mesh_up = get_inner_points(zw, lw, layer_height, lgr_points, max_rad, true);
+    vector_of_points inner_mesh_down = get_inner_points(zw, lw, layer_height, lgr_points, max_rad, false);
+
+    inner_mesh_up.insert(
+        inner_mesh_up.end(),
+        inner_mesh_down.begin(),
+        inner_mesh_down.end()
+    );
+
+    return rotate_mesh(inner_mesh_up, segments, false);
 }

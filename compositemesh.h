@@ -1,5 +1,23 @@
 #pragma once
 
+
+point get_intersection_of_line_segments(segment l1, segment l2)
+{
+    if(bg::intersects(l1, l2))
+    {
+        vector_of_points intersection_points;
+
+        bg::intersection(l1, l2, intersection_points);
+
+        if(intersection_points.size() > 1)
+        {
+            throw std::runtime_error("More than 1 intrersection point at segment");
+        }
+
+        return intersection_points.front();
+    }
+}
+
 /**
     * Generation of a cylinder mesh
     * @param zw well centers depth
@@ -70,5 +88,70 @@ mesh_points_vector make_composite_mesh(
 
     capsule_mesh.insert(capsule_mesh.end(), bottom_circle.begin(), bottom_circle.end());
 
-    return rotate_mesh(capsule_mesh, segments);
+    return rotate_mesh(capsule_mesh, segments, true);
 }
+
+
+vector_of_points get_inner_points(
+    value_type zw,
+    value_type lw,
+    value_type h,
+    const vector_of_points &lgr_points,
+    value_type max_rad,
+    bool is_upperside_points
+)
+{
+    vector_of_points inner_mesh;
+
+    inner_mesh.push_back(bg::make<point>(0.0, 0.0));
+    inner_mesh.push_back(bg::make<point>(0.0, h));
+
+    segment cylinder_side = get_line_seg(
+                                bg::make<point>(max_rad, 0.0),
+                                bg::make<point>(max_rad, h));
+
+    std::for_each(
+        lgr_points.begin(),
+        lgr_points.end(),
+        [&zw, &lw, &h, &max_rad, &inner_mesh, &cylinder_side, &is_upperside_points](point p)
+        {
+            // if point lay at cylinder 
+            if(bg::get<0>(p) <  max_rad)
+            {
+                if(is_upperside_points)
+                {
+                    inner_mesh.push_back(p);
+                }
+                else
+                {
+                    inner_mesh.push_back(bg::make<point>(
+                        bg::get<0>(p), bg::get<1>(p) + h));
+                }
+            }
+            // if point do not lay at cylinder
+            else
+            {
+                point pw = point(0, 0);
+
+                if(is_upperside_points)
+                {
+                    pw = bg::make<point>(0.0, zw - lw/2);
+                }
+                else
+                {
+                    p = bg::make<point>(bg::get<0>(p), bg::get<1>(p) + h);
+                    pw = bg::make<point>(0.0, zw + lw/2);
+                }
+
+                segment point_to_pw_line = get_line_seg(pw, p);
+
+                inner_mesh.push_back(get_intersection_of_line_segments(cylinder_side, point_to_pw_line));
+            }
+        }
+    );
+    
+    return inner_mesh;
+}
+
+
+

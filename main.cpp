@@ -22,6 +22,10 @@ int main()
 
     mesh_points_vector resulted_mesh = get_mesh_nodes(zw, lw, circle_radius, layer_height, lgr_points, segments, cylinder_count, mesh_count);
 
+    mesh_points_vector inner_cylinder_mesh = get_inner_nodes(zw,lw,circle_radius,layer_height,lgr_points, segments);
+
+    resulted_mesh.insert(resulted_mesh.end(), inner_cylinder_mesh.begin(), inner_cylinder_mesh.end());
+
     elements_vector elems = connect_elems(resulted_mesh, mesh_count, cylinder_count, lgr_points.size(), segments);
 
     form_vtk_file(resulted_mesh, elems);
