@@ -1,5 +1,23 @@
-#include "../FlatMesh.h"
-#include "../meths/detailfunctions.h"
+#pragma once
+
+
+point get_intersection_of_line_segments_flat(segment l1, segment l2)
+{
+    if(bg::intersects(l1, l2))
+    {
+        vector_of_points intersection_points;
+
+        bg::intersection(l1, l2, intersection_points);
+
+        if(intersection_points.size() > 1)
+        {
+            throw std::runtime_error("More than 1 intrersection point at segment");
+        }
+
+        return intersection_points.front();
+    }
+}
+
 
 vector_of_points FlatMesh::get_inner_points(
         value_type max_rad,
@@ -48,7 +66,7 @@ vector_of_points FlatMesh::get_inner_points(
                     pw = bg::make<point>(0.0, m_zw + m_lw/2);
                 }
 
-                inner_mesh.push_back(get_intersection_of_line_segments(cylinder_side, get_line_seg(pw, p)));
+                inner_mesh.push_back(get_intersection_of_line_segments_flat(cylinder_side, get_line_seg(pw, p)));
             }
         }
     );
@@ -100,7 +118,7 @@ vector_of_points FlatMesh::get_sphere_approx(
 
 
 vector_of_points FlatMesh::get_cylinder_mesh(
-    bool is_not_well_trajectory = true
+    bool is_not_well_trajectory
 )
 {
     // regular mesh
@@ -114,7 +132,7 @@ vector_of_points FlatMesh::get_cylinder_mesh(
         {
             cylinder_mesh.push_back(
                 bg::make<point>(
-                    m_circle_radius, 
+                    value_type(m_circle_radius), 
                     m_zw - m_lw/2 + i * h
                 )
             );
@@ -123,7 +141,7 @@ vector_of_points FlatMesh::get_cylinder_mesh(
         {
             cylinder_mesh.push_back(
                 bg::make<point>(
-                    0, 
+                    0.0, 
                     m_zw - m_lw/2 + i * h
                 )
             );

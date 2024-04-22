@@ -24,7 +24,7 @@ class CapsuleMesh
 
     // entry data
 private:
-    vector_of_points m_flat_mesh;
+    FlatMesh m_flat_mesh;
     vector_of_points m_well_mesh;
 
     index_type m_segments_count;
@@ -51,7 +51,7 @@ private:
 
 public:
     CapsuleMesh(
-        const vector_of_points &flat_mesh,
+        const FlatMesh &flat_mesh,
         const vector_of_points &well_mesh,
         index_type segments_count,
         index_type cylinder_size,
@@ -78,7 +78,7 @@ public:
     void form_vtk_file();
 
 public:
-    void get_inner_nodes();
+    mesh_points_vector get_inner_nodes();
 
 public:
     void get_capsular_elements();
@@ -93,28 +93,28 @@ private:
     void add_well_trajectory_to_mesh();
 
 private:
-    mesh_points_vector CapsuleMesh::get_mesh_by_layers();
+    mesh_points_vector get_mesh_by_layers();
 
 private:
-    mesh_points_vector CapsuleMesh::get_capsular_mesh_at_layer(
+    mesh_points_vector get_capsular_mesh_at_layer(
         value_type circle_radius
     );
 
 private:
-    mesh_points_vector CapsuleMesh::rotate_mesh(
+    mesh_points_vector rotate_mesh(
         const vector_of_points& mesh,
         int rotations,
         bool is_mesh_with_polar = true
     );
 
 private:
-    elements_vector CapsuleMesh::connect_elems();
+    elements_vector connect_elems();
 
 private:
     elements_vector last_lgr_connection_with_well();
 
 private:
-    elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(index_type n_side);
+    elements_vector create_polar_mesh_around_well_segment(index_type n_side);
 
 private:
     elements_vector connect_with_pervious_lgr(
@@ -122,14 +122,14 @@ private:
     );
 
 private:
-    elements_vector CapsuleMesh::create_between_layer_polar_connection(
+    elements_vector create_between_layer_polar_connection(
         index_type n_side,
         index_type n_layer,
         index_type current_lgr_idx
     );
 
 private:
-    elements_vector CapsuleMesh::create_between_layer_side_connection(
+    elements_vector create_between_layer_side_connection(
         index_type n_side,
         index_type n_layer,
         index_type current_lgr_idx
@@ -146,3 +146,6 @@ private:
     );
 
 };
+
+#include "detail/CapsuleMesh.inl"
+#include "detail/CapsuleMeshAlgorithms.inl"

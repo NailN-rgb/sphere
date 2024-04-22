@@ -1,5 +1,22 @@
-#include "../CapsuleMesh.h"
-#include "../meths/detailfunctions.h"
+#pragma once
+
+point get_intersection_of_line_segments(segment l1, segment l2)
+{
+    if(bg::intersects(l1, l2))
+    {
+        vector_of_points intersection_points;
+
+        bg::intersection(l1, l2, intersection_points);
+
+        if(intersection_points.size() > 1)
+        {
+            throw std::runtime_error("More than 1 intrersection point at segment");
+        }
+
+        return intersection_points.front();
+    }
+}
+
 
 value_type degrees_to_radians(value_type deg)
 {
@@ -9,10 +26,27 @@ value_type degrees_to_radians(value_type deg)
 
 void CapsuleMesh::add_well_trajectory_to_mesh()
 {
+    mesh_points_vector well_points;
+
+    std::for_each(
+        m_well_mesh.begin(),
+        m_well_mesh.end(),
+        [this, &well_points](point p)
+        {
+            well_points.push_back(
+                bg::make<point3d>(
+                    0.0,
+                    0.0, 
+                    bg::get<1>(m_well_mesh)
+                )
+            );
+        }
+    );
+
     capsule_mesh.insert(
         capsule_mesh.end(),
-        m_well_mesh.begin(),
-        m_well_mesh.end()
+        well_points.begin(),
+        well_points.end()
     );
 }
 
@@ -21,7 +55,7 @@ mesh_points_vector CapsuleMesh::get_capsular_mesh_at_layer(
     value_type circle_radius
 )
 {
-    FlatMesh mesh(m_zw, m_lw, circle_radius, m_layer_height, m_lgr_points, m_segments_count, m_cylinder_count, m_mesh_count, false);
+    FlatMesh mesh = m_flat_mesh;
 
     mesh.get_mesh();
 
@@ -32,7 +66,7 @@ mesh_points_vector CapsuleMesh::get_capsular_mesh_at_layer(
 mesh_points_vector CapsuleMesh::rotate_mesh(
     const vector_of_points& mesh,
     int rotations,
-    bool is_mesh_with_polar = true
+    bool is_mesh_with_polar
 )
 {
     value_type theta = degrees_to_radians(360 / rotations);
@@ -575,7 +609,7 @@ elements_vector CapsuleMesh::connect_elems()
 }
 
 
-void CapsuleMesh::get_inner_nodes()
+mesh_points_vector CapsuleMesh::get_inner_nodes()
 {
     vector_of_points inner_mesh_up = get_inner_points(true);
     vector_of_points inner_mesh_down = get_inner_points(false);

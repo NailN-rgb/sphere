@@ -1,4 +1,5 @@
-#include "../CapsuleMesh.h"
+#pragma once
+
 
 void CapsuleMesh::get_capsular_elements()
 {

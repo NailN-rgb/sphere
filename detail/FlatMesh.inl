@@ -1,4 +1,5 @@
-#include "../FlatMesh.h"
+#pragma once
+
 
 void FlatMesh::get_mesh()
 {
@@ -51,7 +52,7 @@ void FlatMesh::get_outer_mesh()
     std::reverse(bottom_circle.begin(), bottom_circle.end());
 
     // get points at cylinder
-    vector_of_points cylinder_mesh = get_cylinder_mesh();
+    vector_of_points cylinder_mesh = get_cylinder_mesh(true);
 
     // connect meshes
     mesh_points.insert(mesh_points.end(), top_circle.begin(), top_circle.end());

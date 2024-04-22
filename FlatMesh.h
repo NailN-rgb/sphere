@@ -14,7 +14,7 @@ class FlatMesh
 
     typedef std::vector<point> vector_of_points;
 
-private:
+public:
     value_type m_zw               = 5;
     value_type m_lw               = 3;
     value_type m_circle_radius    = 1;
@@ -96,7 +96,7 @@ private:
     vector_of_points get_cylinder_mesh(
         bool is_not_well_trajectory = true
     );
-
-
-
 };
+
+#include "detail/FlatMesh.inl"
+#include "detail/FlatMeshAlgorithms.inl"

@@ -6,29 +6,37 @@
 
 #IncludeRegexTransform: 
 
-/home/nail/work/TestProjs/sphere/compositemesh.h
+/home/nail/work/TestProjs/sphere/CapsuleMesh.h
+precompile.h
+/home/nail/work/TestProjs/sphere/precompile.h
+FlatMesh.h
+/home/nail/work/TestProjs/sphere/FlatMesh.h
+detail/CapsuleMesh.inl
+/home/nail/work/TestProjs/sphere/detail/CapsuleMesh.inl
+detail/CapsuleMeshAlgorithms.inl
+/home/nail/work/TestProjs/sphere/detail/CapsuleMeshAlgorithms.inl
 
-/home/nail/work/TestProjs/sphere/createmesh.h
+/home/nail/work/TestProjs/sphere/FlatMesh.h
+precompile.h
+/home/nail/work/TestProjs/sphere/precompile.h
+detail/FlatMesh.inl
+/home/nail/work/TestProjs/sphere/detail/FlatMesh.inl
+detail/FlatMeshAlgorithms.inl
+/home/nail/work/TestProjs/sphere/detail/FlatMeshAlgorithms.inl
 
-/home/nail/work/TestProjs/sphere/elementsaseemble.h
+/home/nail/work/TestProjs/sphere/detail/CapsuleMesh.inl
+
+/home/nail/work/TestProjs/sphere/detail/CapsuleMeshAlgorithms.inl
+
+/home/nail/work/TestProjs/sphere/detail/FlatMesh.inl
+
+/home/nail/work/TestProjs/sphere/detail/FlatMeshAlgorithms.inl
 
 /home/nail/work/TestProjs/sphere/main.cpp
 precompile.h
 /home/nail/work/TestProjs/sphere/precompile.h
-sphericmesh.h
-/home/nail/work/TestProjs/sphere/sphericmesh.h
-rotatemesh.h
-/home/nail/work/TestProjs/sphere/rotatemesh.h
-compositemesh.h
-/home/nail/work/TestProjs/sphere/compositemesh.h
-createmesh.h
-/home/nail/work/TestProjs/sphere/createmesh.h
-elementsaseemble.h
-/home/nail/work/TestProjs/sphere/elementsaseemble.h
-outputmesh.h
-/home/nail/work/TestProjs/sphere/outputmesh.h
-
-/home/nail/work/TestProjs/sphere/outputmesh.h
+CapsuleMesh.h
+/home/nail/work/TestProjs/sphere/CapsuleMesh.h
 
 /home/nail/work/TestProjs/sphere/precompile.h
 cmath
@@ -49,8 +57,4 @@ iostream
 -
 deque
 -
-
-/home/nail/work/TestProjs/sphere/rotatemesh.h
-
-/home/nail/work/TestProjs/sphere/sphericmesh.h
 
