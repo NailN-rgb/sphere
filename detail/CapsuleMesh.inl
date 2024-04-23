@@ -42,6 +42,8 @@ mesh_points_vector CapsuleMesh::get_mesh_by_layers()
             mesh_at_layer.end()
         );
     }
+
+    return layers_mesh;
 }
 
 

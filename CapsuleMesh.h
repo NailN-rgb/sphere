@@ -47,7 +47,7 @@ private:
     value_type m_layer_height     = 10;
     vector_of_points m_lgr_points {point(1,0), point(2,0), point(3,0), point(4,0), point(5,0), point(6,0), point(7,0), point(8,0), point(20,0), point(50,0)};   // { point(1,0), point(2,0), point(3,0), point(4,0)};
     index_type m_cylinder_count   = 10;
-    index_type m_mesh_count       = 4;
+    index_type m_mesh_count       = 2;
 
 public:
     CapsuleMesh(

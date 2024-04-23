@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/nail/work/TestProjs/sphere/build",
-  "command": "/usr/bin/g++    -g   -o CMakeFiles/sphere.dir/main.cpp.o -c /home/nail/work/TestProjs/sphere/main.cpp",
-  "file": "/home/nail/work/TestProjs/sphere/main.cpp"
-}
-]

@@ -5,6 +5,7 @@ void FlatMesh::get_mesh()
 {
     if(m_bcreate_outer_mesh)
     {
+        mesh_points.clear();
         get_outer_mesh();
         well_points = get_cylinder_mesh(false);
     }   
