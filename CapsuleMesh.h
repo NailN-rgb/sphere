@@ -2,6 +2,7 @@
 
 #include "precompile.h"
 #include "FlatMesh.h"
+#include "DataTypes/Element/Element.h"
 
 
 class CapsuleMesh
@@ -20,7 +21,7 @@ class CapsuleMesh
 
     typedef std::vector<point3d> mesh_points_vector;
     typedef std::vector<point> vector_of_points;
-    typedef std::vector<vector_of_values> elements_vector;
+    typedef std::vector<Element> elements_vector;
 
     // entry data
 private:
@@ -65,6 +66,23 @@ public:
     m_cylinder_size(cylinder_size),
     m_points_size(poins_size),
     m_capsule_count(capsule_count),
+    m_max_radius(max_radius)
+    {
+    }
+
+public:
+    CapsuleMesh(
+        const FlatMesh &flat_mesh,
+        const vector_of_points &well_mesh,
+        MeshProperties prop,
+        value_type max_radius
+    ) :
+    m_flat_mesh(flat_mesh),
+    m_well_mesh(well_mesh),
+    m_segments_count(prop.m_segments),
+    m_cylinder_size(prop.m_cylinder_count),
+    m_points_size(prop.m_points_size),
+    m_capsule_count(prop.m_mesh_count),
     m_max_radius(max_radius)
     {
     }

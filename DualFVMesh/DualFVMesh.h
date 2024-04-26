@@ -1,7 +1,8 @@
 #include "../precompile.h"
+#include "../DataTypes/Element/Element.h"
 
 
-class DualFV
+class DualMesh
 {
     typedef double value_type;
     typedef int index_type;
@@ -14,7 +15,7 @@ class DualFV
 
     typedef std::vector<point3d> mesh_points_vector;
     typedef std::vector<point> vector_of_points;
-    typedef std::vector<vector_of_indexes> elements_vector;
+    typedef std::vector<Element> elements_vector;
 
     typedef std::vector<vector_of_indexes> FV;
 
@@ -26,7 +27,7 @@ private:
     mesh_points_vector m_dual_points;
 
 public:
-    DualFV(
+    DualMesh(
         elements_vector elems,
         mesh_points_vector mesh
     ):

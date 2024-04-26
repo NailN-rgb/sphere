@@ -59,13 +59,13 @@ void print3d_mesh(std::vector<point3d> pts)
 }
 
 
-int get_elems_size(std::vector<std::vector<double>> elems)
+int get_elems_size(std::vector<Element> elems)
 {
     int size = 0;
 
     for(auto elem : elems)
     {
-        size += elem.size();
+        size += elem.get_element_size();
     }
 
     return size;
@@ -105,9 +105,9 @@ void CapsuleMesh::form_vtk_file()
 
         for(size_t i = 0; i < elems_count; i++)
         {
-            file << mesh_elements[i].size() << "\t";
+            file << mesh_elements[i].get_element_size() << "\t";
             
-            for(auto idx : mesh_elements[i])
+            for(auto idx : mesh_elements[i].get_element())
             {
                 file << idx << '\t'; 
             }
@@ -125,19 +125,19 @@ void CapsuleMesh::form_vtk_file()
 
         for(size_t i = 0; i < elems_count; i++)
         {
-            if(mesh_elements[i].size() == 6)
+            if(mesh_elements[i].get_element_size() == 6)
             {
                 file << 13 << std::endl;
             }
-            else if(mesh_elements[i].size() == 4)
+            else if(mesh_elements[i].get_element_size() == 4)
             {
                 file << 10 << std::endl;
             }
-            else if(mesh_elements[i].size() == 5)
+            else if(mesh_elements[i].get_element_size() == 5)
             {
                 file << 14 << std::endl;
             }
-            else if(mesh_elements[i].size() == 8)
+            else if(mesh_elements[i].get_element_size() == 8)
             {
                 file << 12 << std::endl;
             }

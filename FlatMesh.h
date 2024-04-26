@@ -2,6 +2,8 @@
 
 #include "precompile.h"
 
+#include "MeshProperties/MeshProperties.h"
+
 class FlatMesh
 {
     typedef bg::model::point<double, 2, bg::cs::cartesian> point;
@@ -54,6 +56,26 @@ public:
     m_mesh_count(mesh_count),
     m_bcreate_outer_mesh(bcreate_outer_mesh)
     {} 
+
+public:
+    FlatMesh(
+        MeshProperties prop,
+        bool is_inner
+    ) :
+    m_zw(prop.m_zw),
+	m_lw(prop.m_lw),
+	m_circle_radius(prop.m_circle_radius),
+	m_layer_height(prop.m_layer_height),
+	m_lgr_points(prop.m_lgr_points),
+	m_segments(prop.m_segments),
+    m_cylinder_count(prop.m_cylinder_count),
+    m_mesh_count(prop.m_mesh_count),
+    m_bcreate_outer_mesh(is_inner)
+    {}
+
+
+public:
+    FlatMesh() = default;
 
     ~FlatMesh() = default;
 

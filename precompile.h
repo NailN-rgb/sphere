@@ -22,6 +22,9 @@ typedef double value_type;
 typedef int index_type;
 typedef size_t size_type;
 
+typedef std::vector<value_type> vector_of_values;
+typedef std::vector<index_type> vector_of_indexes;
+
+
 typedef std::vector<point3d> mesh_points_vector;
 typedef std::vector<point> vector_of_points;
-typedef std::vector<std::vector<double>> elements_vector;

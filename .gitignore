@@ -2,3 +2,5 @@
 /ex.vtk
 /points.vtk
 /build
+
+*.vtk
