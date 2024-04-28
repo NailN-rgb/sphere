@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../CapsuleMesh.h"
+
 point get_intersection_of_line_segments(segment l1, segment l2)
 {
     if(bg::intersects(l1, l2))
@@ -127,25 +129,25 @@ elements_vector CapsuleMesh::create_prizmoidal_mesh_around_well(
             {
                 // there i - relative number of first cylindral point
 
-                vector_of_values elem;
+                Element elem(6);
                 
                 // point at selected capsile side
-                elem.push_back(2 + m_cylinder_size + m_points_size + idx + k * n_side);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + idx + k * n_side);
 
                 // point at next segment side
-                elem.push_back(2 + m_cylinder_size + m_points_size + n_side + idx + k * n_side );
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + n_side + idx + k * n_side );
 
                 // well segment
-                elem.push_back(idx);
+                elem.add_to_element(idx);
 
                 // downer point at selected capsile side
-                elem.push_back(2 + m_cylinder_size + m_points_size + 1 + idx + k * n_side);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + 1 + idx + k * n_side);
 
                 // downer point at next segment side
-                elem.push_back(2 + m_cylinder_size + m_points_size + n_side + 1 + idx + k * n_side);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + n_side + 1 + idx + k * n_side);
 
                 // downer well segment
-                elem.push_back(idx + 1);
+                elem.add_to_element(idx + 1);
 
                 prizmoidal_elems.push_back(elem);
             }
@@ -156,25 +158,25 @@ elements_vector CapsuleMesh::create_prizmoidal_mesh_around_well(
             {
                 // there i - relative number of first cylindral point
 
-                vector_of_values elem;
+                Element elem(6);
                 
                 // point at selected capsile side
-                elem.push_back(2 + m_cylinder_size + m_points_size + idx + k * n_side);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + idx + k * n_side);
 
                 // point at next segment side
-                elem.push_back(2 + m_cylinder_size + m_points_size + idx);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + idx);
 
                 // well segment
-                elem.push_back(idx);
+                elem.add_to_element(idx);
 
                 // downer point at selected capsile side
-                elem.push_back(2 + m_cylinder_size + m_points_size + 1 + idx + k * n_side);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + 1 + idx + k * n_side);
 
                 // downer point at next segment side
-                elem.push_back(2 + m_cylinder_size + m_points_size + 1 + idx);
+                elem.add_to_element(2 + m_cylinder_size + m_points_size + 1 + idx);
 
                 // downer well segment
-                elem.push_back(idx + 1);
+                elem.add_to_element(idx + 1);
 
                 prizmoidal_elems.push_back(elem);
             }
@@ -203,27 +205,27 @@ elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(
     // at polar
     for(int k = 0; k < m_segments_count; k++)
     {
-        vector_of_values elem;
+        Element elem(4);
 
         if(k < m_segments_count - 1)
         {
-            elem.push_back(m_cylinder_size);
+            elem.add_to_element(m_cylinder_size);
 
-            elem.push_back(m_cylinder_size + 2 + k * n_side);
+            elem.add_to_element(m_cylinder_size + 2 + k * n_side);
 
-            elem.push_back(m_cylinder_size + 2 + (k + 1) * n_side);
+            elem.add_to_element(m_cylinder_size + 2 + (k + 1) * n_side);
 
-            elem.push_back(0); 
+            elem.add_to_element(0); 
         }
         else
         {
-            elem.push_back(m_cylinder_size);
+            elem.add_to_element(m_cylinder_size);
 
-            elem.push_back(m_cylinder_size + 2 + k * n_side);
+            elem.add_to_element(m_cylinder_size + 2 + k * n_side);
 
-            elem.push_back(m_cylinder_size + 2);
+            elem.add_to_element(m_cylinder_size + 2);
 
-            elem.push_back(0); 
+            elem.add_to_element(0); 
         }
 
         polar_mesh.push_back(elem);
@@ -236,17 +238,17 @@ elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(
         {
             for(int idx = 0; idx < m_points_size; idx++)
             {
-                vector_of_values elem;
+                Element elem(5);
                 // right up point
-                elem.push_back(m_cylinder_size + 2 + idx + k * n_side);
+                elem.add_to_element(m_cylinder_size + 2 + idx + k * n_side);
                 // right down point
-                elem.push_back(m_cylinder_size + 3 + idx + k * n_side);
+                elem.add_to_element(m_cylinder_size + 3 + idx + k * n_side);
                 // left down point
-                elem.push_back(m_cylinder_size + 3 + idx + (k + 1) * n_side);
+                elem.add_to_element(m_cylinder_size + 3 + idx + (k + 1) * n_side);
                 // left up point
-                elem.push_back(m_cylinder_size + 2 + idx + (k + 1) * n_side);
+                elem.add_to_element(m_cylinder_size + 2 + idx + (k + 1) * n_side);
                 // well head
-                elem.push_back(0);
+                elem.add_to_element(0);
 
                 polar_mesh.push_back(elem);
             }
@@ -255,17 +257,17 @@ elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(
         {
             for (int idx = 0; idx < m_points_size; idx++)
             {
-                vector_of_values elem;
+                Element elem(5);
                 // right up point
-                elem.push_back(m_cylinder_size + 2 + idx + k * n_side);
+                elem.add_to_element(m_cylinder_size + 2 + idx + k * n_side);
                 // right down point
-                elem.push_back(m_cylinder_size + 3 + idx + k * n_side);
+                elem.add_to_element(m_cylinder_size + 3 + idx + k * n_side);
                 // left down point
-                elem.push_back(m_cylinder_size + 3 + idx);
+                elem.add_to_element(m_cylinder_size + 3 + idx);
                 // left up point
-                elem.push_back(m_cylinder_size + 2 + idx);
+                elem.add_to_element(m_cylinder_size + 2 + idx);
                 // well head
-                elem.push_back(0);
+                elem.add_to_element(0);
 
                 polar_mesh.push_back(elem);
             }
@@ -287,29 +289,29 @@ elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(
     // at polar
     for(int k = 0; k < m_segments_count; k++)
     {
-        vector_of_values elem;
+        Element elem(4);
 
         if(k < m_segments_count - 1)
         {
             // polar point
-            elem.push_back(m_cylinder_size + 1);
+            elem.add_to_element(m_cylinder_size + 1);
 
-            elem.push_back(2 * m_cylinder_size + 1 + 2 * m_points_size + k * n_side);
+            elem.add_to_element(2 * m_cylinder_size + 1 + 2 * m_points_size + k * n_side);
 
-            elem.push_back(2 * m_cylinder_size + 1 + 2 * m_points_size + (k + 1) * n_side);
+            elem.add_to_element(2 * m_cylinder_size + 1 + 2 * m_points_size + (k + 1) * n_side);
             // well point
-            elem.push_back(m_cylinder_size - 1); 
+            elem.add_to_element(m_cylinder_size - 1); 
         }
         else
         {
             // polar point
-            elem.push_back(m_cylinder_size + 1);
+            elem.add_to_element(m_cylinder_size + 1);
 
-            elem.push_back(2 * m_cylinder_size + 1 + 2 * m_points_size + k * n_side);
+            elem.add_to_element(2 * m_cylinder_size + 1 + 2 * m_points_size + k * n_side);
 
-            elem.push_back(2 * m_cylinder_size + 1 + 2 * m_points_size);
+            elem.add_to_element(2 * m_cylinder_size + 1 + 2 * m_points_size);
             // well point
-            elem.push_back(m_cylinder_size - 1); 
+            elem.add_to_element(m_cylinder_size - 1); 
         }
 
         polar_mesh.push_back(elem);
@@ -322,17 +324,17 @@ elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(
         {
             for(int idx = 0; idx < m_points_size; idx++)
             {
-                vector_of_values elem;
+                Element elem(5);
                 // right up point
-                elem.push_back(2 * m_cylinder_size + 2 + m_points_size + idx + k * n_side);
+                elem.add_to_element(2 * m_cylinder_size + 2 + m_points_size + idx + k * n_side);
                 // right down point
-                elem.push_back(2 * m_cylinder_size + 1 + m_points_size + idx + k * n_side);
+                elem.add_to_element(2 * m_cylinder_size + 1 + m_points_size + idx + k * n_side);
                 // left down point
-                elem.push_back(2 * m_cylinder_size + 1 + m_points_size + idx + (k + 1) * n_side);
+                elem.add_to_element(2 * m_cylinder_size + 1 + m_points_size + idx + (k + 1) * n_side);
                 // left up point
-                elem.push_back(2 * m_cylinder_size + 2 + m_points_size + idx + (k + 1) * n_side);
+                elem.add_to_element(2 * m_cylinder_size + 2 + m_points_size + idx + (k + 1) * n_side);
                 // well head
-                elem.push_back(m_cylinder_size - 1);
+                elem.add_to_element(m_cylinder_size - 1);
 
                 polar_mesh.push_back(elem);
             }
@@ -341,18 +343,18 @@ elements_vector CapsuleMesh::create_polar_mesh_around_well_segment(
         {
             for (int idx = 0; idx < m_points_size; idx++)
             {
-                vector_of_values elem;
+                Element elem(5);
                 // right up point
                 // right up point
-                elem.push_back(2 * m_cylinder_size + 2 + m_points_size + idx + k * n_side);
+                elem.add_to_element(2 * m_cylinder_size + 2 + m_points_size + idx + k * n_side);
                 // right down point
-                elem.push_back(2 * m_cylinder_size + 1 + m_points_size + idx + k * n_side);
+                elem.add_to_element(2 * m_cylinder_size + 1 + m_points_size + idx + k * n_side);
                 // left down point
-                elem.push_back(2 * m_cylinder_size + 1 + m_points_size + idx);
+                elem.add_to_element(2 * m_cylinder_size + 1 + m_points_size + idx);
                 // left up point
-                elem.push_back(2 * m_cylinder_size + 2 + m_points_size + idx);
+                elem.add_to_element(2 * m_cylinder_size + 2 + m_points_size + idx);
                 // well head
-                elem.push_back(m_cylinder_size - 1);
+                elem.add_to_element(m_cylinder_size - 1);
 
                 polar_mesh.push_back(elem);
             }
@@ -399,37 +401,37 @@ elements_vector CapsuleMesh::create_between_layer_polar_connection(
     {
         if(k < m_segments_count - 1)
         {
-            vector_of_values elem;
+            Element elem(6);
 
             auto segment_offset = k * n_side;
 
             // elem part at previous layer
-            elem.push_back(m_cylinder_size + current_lgr_idx * n_layer);
-            elem.push_back(m_cylinder_size + 2  + current_lgr_idx * n_layer + segment_offset);
-            elem.push_back(m_cylinder_size + 2 + n_side  + current_lgr_idx * n_layer + segment_offset);
+            elem.add_to_element(m_cylinder_size + current_lgr_idx * n_layer);
+            elem.add_to_element(m_cylinder_size + 2  + current_lgr_idx * n_layer + segment_offset);
+            elem.add_to_element(m_cylinder_size + 2 + n_side  + current_lgr_idx * n_layer + segment_offset);
 
             // elem part at next layer
-            elem.push_back(m_cylinder_size + (current_lgr_idx + 1) * n_layer);
-            elem.push_back(m_cylinder_size + 2  + (current_lgr_idx + 1) * n_layer + segment_offset);
-            elem.push_back(m_cylinder_size + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset);
+            elem.add_to_element(m_cylinder_size + (current_lgr_idx + 1) * n_layer);
+            elem.add_to_element(m_cylinder_size + 2  + (current_lgr_idx + 1) * n_layer + segment_offset);
+            elem.add_to_element(m_cylinder_size + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset);
 
             polar_elems.push_back(elem);
         }
         else
         {
-            vector_of_values elem;
+            Element elem(6);
 
             auto segment_offset = k * n_side;
             
             // elem part at previous layer
-            elem.push_back(m_cylinder_size + current_lgr_idx * n_layer);
-            elem.push_back(m_cylinder_size + 2  + current_lgr_idx * n_layer + segment_offset);
-            elem.push_back(m_cylinder_size + 2 + n_side  + current_lgr_idx * n_layer + segment_offset - (k + 1) * n_side);
+            elem.add_to_element(m_cylinder_size + current_lgr_idx * n_layer);
+            elem.add_to_element(m_cylinder_size + 2  + current_lgr_idx * n_layer + segment_offset);
+            elem.add_to_element(m_cylinder_size + 2 + n_side  + current_lgr_idx * n_layer + segment_offset - (k + 1) * n_side);
 
             // elem part at next layer
-            elem.push_back(m_cylinder_size + (current_lgr_idx + 1) * n_layer);
-            elem.push_back(m_cylinder_size + 2  + (current_lgr_idx + 1) * n_layer + segment_offset);
-            elem.push_back(m_cylinder_size + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset - (k + 1) * n_side);
+            elem.add_to_element(m_cylinder_size + (current_lgr_idx + 1) * n_layer);
+            elem.add_to_element(m_cylinder_size + 2  + (current_lgr_idx + 1) * n_layer + segment_offset);
+            elem.add_to_element(m_cylinder_size + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset - (k + 1) * n_side);
 
             polar_elems.push_back(elem);
         }
@@ -443,20 +445,20 @@ elements_vector CapsuleMesh::create_between_layer_polar_connection(
     {
         if(k < m_segments_count - 1)
         {
-            vector_of_values elem;
+            Element elem(6);
 
             auto segment_offset = k * n_side;
             auto polar_offset   = n_side - 1;
 
             // elem part at previous layer
-            elem.push_back(m_cylinder_size + 1 + current_lgr_idx * n_layer);
-            elem.push_back(m_cylinder_size + 2  + current_lgr_idx * n_layer + segment_offset + polar_offset);
-            elem.push_back(m_cylinder_size + 2 + n_side  + current_lgr_idx * n_layer + segment_offset + polar_offset);
+            elem.add_to_element(m_cylinder_size + 1 + current_lgr_idx * n_layer);
+            elem.add_to_element(m_cylinder_size + 2  + current_lgr_idx * n_layer + segment_offset + polar_offset);
+            elem.add_to_element(m_cylinder_size + 2 + n_side  + current_lgr_idx * n_layer + segment_offset + polar_offset);
 
             // elem part at next layer
-            elem.push_back(m_cylinder_size + 1 + (current_lgr_idx + 1) * n_layer);
-            elem.push_back(m_cylinder_size + 2  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
-            elem.push_back(m_cylinder_size + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
+            elem.add_to_element(m_cylinder_size + 1 + (current_lgr_idx + 1) * n_layer);
+            elem.add_to_element(m_cylinder_size + 2  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
+            elem.add_to_element(m_cylinder_size + 2 + n_side  + (current_lgr_idx + 1) * n_layer + segment_offset + polar_offset);
 
             polar_elems.push_back(elem);
         }
@@ -499,7 +501,7 @@ elements_vector CapsuleMesh::create_between_layer_side_connection(
         {
             for(int i = 0; i < 2 * m_points_size + m_cylinder_size - 1; i++)
             {
-                vector_of_values elem;
+                Element elem;
 
                 index_type start_offset = 2 + m_cylinder_size;                // for first non-aroundwell capsule
                 index_type segment_offset = i;                          // offset at fixed segmnts part on capsule
@@ -507,17 +509,17 @@ elements_vector CapsuleMesh::create_between_layer_side_connection(
                 index_type capsular_ofset = current_lgr_idx * n_layer;  // offset between two capsules
 
                 // segment at previous lgr layer
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side);
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side);
                 
 
                 //segment at current layer
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_layer);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_layer);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer);
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer);
 
                 side_elements.push_back(elem);
             }
@@ -526,7 +528,7 @@ elements_vector CapsuleMesh::create_between_layer_side_connection(
         {
             for(int i = 0; i < 2 * m_points_size + m_cylinder_size - 1; i++)
             {
-                vector_of_values elem;
+                Element elem(8);
 
                 index_type start_offset = 2 + m_cylinder_size;                // for first non-aroundwell capsule
                 index_type segment_offset = i;                          // offset at fixed segmnts part on capsule
@@ -534,17 +536,17 @@ elements_vector CapsuleMesh::create_between_layer_side_connection(
                 index_type capsular_ofset = current_lgr_idx * n_layer;  // offset between two capsules
 
                 // segment at previous lgr layer
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset );
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side - (k + 1) * n_side);
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side - (k + 1) * n_side);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset );
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side - (k + 1) * n_side);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side - (k + 1) * n_side);
                 
 
                 //segment at current layer
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_layer);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_layer);
-                elem.push_back(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer - (k + 1) * n_side);
-                elem.push_back(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer - (k + 1) * n_side);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_layer);
+                elem.add_to_element(start_offset + 1 + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer - (k + 1) * n_side);
+                elem.add_to_element(start_offset + segment_offset + capsular_ofset + lgr_offset + n_side + n_layer - (k + 1) * n_side);
 
                 side_elements.push_back(elem);
             }

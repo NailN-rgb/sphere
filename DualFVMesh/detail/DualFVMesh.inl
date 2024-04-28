@@ -1,7 +1,7 @@
 #include "../DualFVMesh"
 
 
-point3d DualFV::get_mass_center(vector_of_indexes element)
+point3d DualMesh::get_mass_center(vector_of_indexes element)
 {
     vector_of_points element_points;
     size_t elem_size = element.size;
@@ -31,7 +31,7 @@ point3d DualFV::get_mass_center(vector_of_indexes element)
 }
 
 
-void DualFV::get_dual_points()
+void DualMesh::get_dual_points()
 {
     std::for_each(
         m_elems.begin(),

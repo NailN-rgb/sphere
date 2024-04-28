@@ -21,6 +21,7 @@ using value_type = double;
 using index_type = int;
 using size_type = size_t;
 
+
 using point = bg::model::point<value_type, 2, bg::cs::cartesian>;
 using point3d = bg::model::point<value_type, 3, bg::cs::cartesian>;
 using polygon = bg::model::polygon<point>;
