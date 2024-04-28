@@ -19,15 +19,16 @@ namespace fs = std::experimental::filesystem;
 
 using value_type = double;
 using index_type = int;
-using size_type = size_t;
+using size_type  = size_t;
 
 
-using point = bg::model::point<value_type, 2, bg::cs::cartesian>;
-using point3d = bg::model::point<value_type, 3, bg::cs::cartesian>;
-using polygon = bg::model::polygon<point>;
-using segment = bg::model::segment<point>;
+using point     = bg::model::point<value_type, 2, bg::cs::cartesian>;
+using point3d   = bg::model::point<value_type, 3, bg::cs::cartesian>;
+using polygon   = bg::model::polygon<point>;
+using segment   = bg::model::segment<point>;
+using segment3d = bg::model::segment<point3d>;
 
 
 using mesh_points_vector = std::vector<point3d>;
-using vector_of_points = std::vector<point>;
-using elements_vector= std::vector<std::vector<value_type>>;
+using vector_of_points   = std::vector<point>;
+using elements_vector    = std::vector<std::vector<value_type>>;
