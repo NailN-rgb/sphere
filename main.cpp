@@ -21,22 +21,15 @@ int main()
     index_type cylinder_count   = 3;
     index_type mesh_count       = 1;
 
-    FlatMesh flat_m(zw, lw, circle_radius, layer_height, lgr_points, segments, cylinder_count, mesh_count, true);
+    // read data array and well params
 
-    flat_m.get_mesh();
+    // create nodes list by 2d mesh
 
-    CapsuleMesh caps_m(flat_m, flat_m.well_points, segments, cylinder_count, lgr_points.size(), mesh_count, 3);
+    // call tetGen
 
-    caps_m.get_capsular_elements();
+    // form VTK
 
-    caps_m.form_vtk_file();
-
-    EdgesMesh edges_list(caps_m.capsule_mesh, cylinder_count, lgr_points.size(), segments);
-
-    edges_list.calculate_edges_list();
-
-    edges_list.write_edges_to_vtk();
-
+    // get DualMesh Tools
 
     return 0;
 }
