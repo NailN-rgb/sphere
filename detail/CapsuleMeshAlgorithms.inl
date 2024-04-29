@@ -620,7 +620,7 @@ mesh_points_vector CapsuleMesh::get_inner_nodes()
         inner_mesh_down.end()
     );
 
-    return rotate_mesh(inner_mesh_up, false);
+    return rotate_mesh(inner_mesh_up, m_segments_count, false);
 }
 
 
@@ -642,7 +642,7 @@ vector_of_points CapsuleMesh::get_inner_points(
         m_lgr_points.end(),
         [this, &inner_mesh, &cylinder_side, &is_upperside_points](point p)
         {
-            // if point lay at cylinder 
+            // if point lay at cylinder head
             if(bg::get<0>(p) <  m_max_radius)
             {
                 if(is_upperside_points)
@@ -655,7 +655,6 @@ vector_of_points CapsuleMesh::get_inner_points(
                         bg::get<0>(p), bg::get<1>(p) + m_layer_height));
                 }
             }
-            // if point do not lay at cylinder
             else
             {
                 auto pw = point(0, 0);

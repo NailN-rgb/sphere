@@ -23,6 +23,14 @@ void CapsuleMesh::get_capsular_nodes()
         layers_mesh.begin(),
         layers_mesh.end()
     );
+
+    mesh_points_vector inner_mesh = get_inner_nodes();
+
+    capsule_mesh.insert(
+        capsule_mesh.end(),
+        inner_mesh.begin(),
+        inner_mesh.end()
+    );
 }
 
 
