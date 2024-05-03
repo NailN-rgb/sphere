@@ -1,38 +1,27 @@
+#pragma once
+
 #include "../precompile.h"
 
 class TwoDMesh
 {
-    using point = bg::model::point<value_type, 2, bg::cs::cartesian>;
-    using point3d = bg::model::point<value_type, 3, bg::cs::cartesian>;
-
-    
-    using value_type = double;
-    using index_type = int;
-    using size_type = size_t;
-
-    using vector_of_values = std::vector<value_type>;
-    using vector_of_points = std::vector<point>;
-    using vector_of_points3d = std::vector<point3d>;
-
-
 private:
     vector_of_points m_points_list;
-    vector_of_points m_boundary_points;
+    bg::model::multi_point<point> m_boundary_points;
     fs::path m_path;
 
-    vector_of_points3d m_points_3d;
+    vector_3d_points m_points_3d;
 
 public:
     explicit TwoDMesh(
         const fs::path& path
     ) :
-    m_path(path) 
+    m_path(path)
     {
         parse();
     }
 
 private:
-    void parse() const
+    void parse() 
     {
         if (!fs::exists(m_path)) {
             throw std::runtime_error("File not found");
@@ -49,16 +38,42 @@ private:
 
             fileStream.close();
         }
+
+        add_third_dimension();
     }
 
-public:
-    vector_of_points get_points_list()
+private:
+    void create_boundary_points()
     {
-        return m_points_list;
+        // TODO: May be we don't need use vector_of_points, using multi_point instead it?
+        // entry data
+        bg::model::multi_point<point> entry_points_mesh;
+
+        std::for_each(
+            m_points_list.begin(),
+            m_points_list.end(),
+            [entry_points_mesh](point p)
+            {
+                //bg::append(entry_points_mesh, p);
+            }
+        );
+
+        // outer data 
+        polygon hull;
+
+        bg::convex_hull(entry_points_mesh, hull);
+
+        //bg::assign(m_boundary_points, hull.outer());
     }
 
 public:
-    vector_of_points get_boundary_points()
+    vector_3d_points get_points_list() const
+    {
+        return m_points_3d;
+    }
+
+public:
+    vector_of_points get_boundary_points() const
     {
         return m_boundary_points;
     }

@@ -9,3 +9,5 @@ if(Boost_FOUND)
 endif()
 
 add_executable(sphere main.cpp)
+
+target_link_libraries(sphere stdc++fs)
