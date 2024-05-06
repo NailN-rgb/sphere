@@ -74,7 +74,7 @@ public:
     CapsuleMesh(
         const FlatMesh &flat_mesh,
         const vector_of_points &well_mesh,
-        MeshProperties prop,
+        const MeshProperties &prop,
         value_type max_radius
     ) :
     m_flat_mesh(flat_mesh),

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../CapsuleMesh.h"
 
 point get_intersection_of_line_segments(segment l1, segment l2)
 {
@@ -110,7 +109,6 @@ mesh_points_vector CapsuleMesh::rotate_mesh(
 
     return capsule;
 }
-
 
 
 elements_vector CapsuleMesh::create_prizmoidal_mesh_around_well(
