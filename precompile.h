@@ -7,24 +7,27 @@
 #include <boost/geometry/geometries/polygon.hpp>
 #include <boost/geometry/algorithms/for_each.hpp>
 #include <boost/geometry/algorithms/intersection.hpp>
+#include <experimental/filesystem>
 
 #include <iostream>
 #include <deque>
+#include <string>
 
 namespace bg = boost::geometry;
-typedef bg::model::point<double, 2, bg::cs::cartesian> point;
-typedef bg::model::point<double, 3, bg::cs::cartesian> point3d;
-typedef bg::model::polygon<point> polygon;
-typedef bg::model::segment<point> segment;
+namespace fs = std::experimental::filesystem;
 
 
-typedef double value_type;
-typedef int index_type;
-typedef size_t size_type;
-
-typedef std::vector<value_type> vector_of_values;
-typedef std::vector<index_type> vector_of_indexes;
+using value_type = double;
+using index_type = int;
+using size_type = size_t;
 
 
-typedef std::vector<point3d> mesh_points_vector;
-typedef std::vector<point> vector_of_points;
+using point = bg::model::point<value_type, 2, bg::cs::cartesian>;
+using point3d = bg::model::point<value_type, 3, bg::cs::cartesian>;
+using polygon = bg::model::polygon<point>;
+using segment = bg::model::segment<point>;
+
+
+using mesh_points_vector = std::vector<point3d>;
+using vector_of_points = std::vector<point>;
+using elements_vector= std::vector<std::vector<value_type>>;
