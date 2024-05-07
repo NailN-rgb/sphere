@@ -21,18 +21,19 @@ int main()
     value_type circle_radius    = 1;
     value_type layer_height     = 10;
     vector_of_points lgr_points {point(1,0), point(2,0)}; //{point(1,0), point(2,0), point(3,0), point(4,0), point(5,0), point(6,0), point(7,0), point(8,0), point(20,0), point(50,0)};   // { point(1,0), point(2,0), point(3,0), point(4,0)};
-    index_type segments         = 4; // > = 3  !!
-    index_type cylinder_count   = 3;
-    index_type mesh_count       = 1;
+    index_type segments         = 12; // > = 3  !!
+    index_type cylinder_count   = 10;
+    index_type mesh_count       = 2;
     value_type max_radius       = 2;
-    fs::path path_to_2d_mesh    = "data/mesh.txt";
+    fs::path path_to_2d_mesh    = "../data/mesh.txt";
 
     // create MeshProperty
     MeshProperties mp(zw, 
         lw,
         circle_radius, 
         layer_height, 
-        lgr_points, segments,
+        lgr_points,
+        segments,
         cylinder_count,
         mesh_count,
         max_radius

@@ -30,10 +30,18 @@ private:
         {
             std::ifstream fileStream(m_path);
 
+            value_type x, y;
+
             std::string line;
-            while (std::getline(fileStream, line)) {
-                std::cout << line << std::endl;
-                std::cout << "Method is not writed now" << std::endl;
+            while (!fileStream.eof()) {
+                fileStream >> x >> y;
+
+                m_points_list.push_back(
+                    bg::make<point>(
+                        x,
+                        y
+                    )
+                );
             }
 
             fileStream.close();
