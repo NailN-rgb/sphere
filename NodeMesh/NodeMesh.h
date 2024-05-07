@@ -11,7 +11,9 @@ private:
     vector_3d_points m_entry_2d_mesh; // full list of entry 2d points with z coord taken by zero
     vector_of_indexes m_atrributes_list; // list of boundary point indexes from m_entry_2d_mesh
     MeshProperties m_prop;
+    index_type m_deleted_points = 0;
 
+public:
     vector_3d_points m_nodes; // resulted mesh points
 
 private:
@@ -53,6 +55,11 @@ public:
         create_inner_mesh();
         form_vtk_file();
 
+        std::cout << "2D points count: " << m_entry_2d_mesh.size() << std::endl;
+        std::cout << "2D points count * log_mesh_size: " << m_entry_2d_mesh.size() * m_log_mesh.size() << std::endl;
+
+
+        std::cout << "Deleted " << m_deleted_points << " points" << std::endl;
     }
 
 private:
@@ -106,25 +113,9 @@ private:
                     }
                     else
                     {
-                        // TODO: throw error
+                        m_deleted_points++;
                         return;
                     }
-                    // else
-                    // {
-                    //     // get length of segment from pwN to intersection with plane
-                    //     auto segment_length = (bg::get<2>(pwN) - bg::get<2>(p)) / std::sin(betta_angle);
-
-                    //     // after that we may find other coordinates of intersection point
-                        
-                    //     m_nodes.push_back(bg::make<point3d>(
-                    //         bg::get<0>(pwN) + segment_length * std::sin(alpha_angle),
-                    //         bg::get<1>(pwN) + segment_length * std::cos(alpha_angle),
-                    //         bg::get<2>(pwN) + segment_length * std::sin(betta_angle)
-                    //     ));
-
-                    //     // exit from loop
-                    //     return;
-                    // }
                 }
             }
         );
@@ -162,27 +153,16 @@ private:
                         auto newz = bg::get<2>(pwS) - (bg::get<2>(p) - bg::get<2>(pwS)) * ratio_quef;
 
                         m_nodes.push_back(bg::make<point3d>(
-                            newx,
-                            newy,
+                            -newx, // TODO: write about this
+                            -newy,
                             newz
                         ));
                     }
-                    // else
-                    // {
-                    //     // get length of segment from pwN to intersection with plane
-                    //     auto segment_length = (bg::get<2>(pwS) - bg::get<2>(p)) / std::sin(betta_angle);
-
-                    //     // after that we may find other coordinates of intersection point
-                        
-                    //     m_nodes.push_back(bg::make<point3d>(
-                    //         bg::get<0>(pwS) + segment_length * std::sin(alpha_angle),
-                    //         bg::get<1>(pwS) + segment_length * std::cos(alpha_angle),
-                    //         bg::get<2>(pwS) + segment_length * std::sin(betta_angle)
-                    //     ));
-
-                    //     // exit from loop
-                    //     return;
-                    // }
+                    else
+                    {
+                        m_deleted_points++;
+                        return;
+                    }
                 }
             }
         );
@@ -200,7 +180,7 @@ private:
                 bg::make<point3d>(
                         bg::get<0>(pwN),
                         bg::get<1>(pwN),
-                        bg::get<2>(pwN) + i * (m_prop.m_lw / m_prop.m_cylinder_count) 
+                        bg::get<2>(pwN) + i * (m_prop.m_lw / (m_prop.m_cylinder_count - 1)) 
                     )
                 );
         }
@@ -212,7 +192,7 @@ private:
     void create_cylindrical_nodes()
     {
         auto h_angle  = 360 / m_prop.m_segments * std::atan(1.) / 45; // angle at radians 
-        auto h_at_cyl = m_prop.m_lw / m_prop.m_cylinder_count;
+        auto h_at_cyl = m_prop.m_lw / (m_prop.m_cylinder_count - 1);
 
         for(index_type i = 0; i < m_prop.m_mesh_count; i++)
         {
@@ -220,7 +200,7 @@ private:
             {
                 for(index_type k = 0; k < m_prop.m_segments; k++)
                 {
-                    auto x_coord_of_created_point = m_log_mesh[i] * std::cos(k * h_angle);
+                    auto x_coord_of_created_point = m_log_mesh[i] * std::cos(k * h_angle + 4 * std::atan(1.)); // to connect with spherical part
                     auto y_coord_of_created_point = m_log_mesh[i] * std::sin(k * h_angle);
                     auto z_coord_of_created_point = bg::get<2>(pwN) + j * h_at_cyl;
 
@@ -328,7 +308,7 @@ private:
 
                     m_nodes.push_back(
                         bg::make<point3d>(
-                            x_coord,
+                            x_coord, // TODO: check
                             y_coord,
                             z_coord
                         )

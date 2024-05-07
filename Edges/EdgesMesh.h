@@ -4,62 +4,54 @@
 
 #include "../DataTypes/Edge/Edge.h"
 #include "../DataTypes/Element/Element.h"
+#include "../MeshProperties/MeshProperties.h"
 
-/**
- * This class create a list of capsular mesh edges
- * TODO: Wire realization for more than one layer mesh
-*/
 
 class EdgesMesh
 {
-    typedef bg::model::point<double, 3, bg::cs::cartesian> point3d;
-    
-    typedef double value_type;
-    typedef int index_type;
-    
-    typedef std::vector<value_type> vector_of_values;
-    typedef std::vector<value_type> vector_of_indexes;
-
-    typedef std::vector<point3d> mesh_points_vector;
-
-    typedef std::vector<Edge> edges_list;
+    using edges_list = std::vector<Edge>;
 
 private:
     mesh_points_vector m_entry_mesh;
+    mesh_points_vector m_resulted_mesh;
     index_type m_cylinder_count;
-    index_type m_points_count;
     index_type m_segments_count;
     index_type m_side;
+    index_type m_well_offset;
+    index_type m_spherical_offset;
+    index_type m_cylinder_offset;
 
+private:
+    bool north_pole_intersected;
+    index_type north_deleted_points;
+    bool south_pole_intersected;
+    index_type south_deleted_points;
 
 public:
     edges_list edges;
 
 public:
     EdgesMesh(
+        const mesh_points_vector& resulted_mesh,
+        MeshProperties prop,
         const mesh_points_vector& entry_mesh,
-        index_type cylinder_count,
-        index_type points_count,
-        index_type segments_count
+        bool north_deleted, // TODO: create struct for this datas
+        bool south_deleted,
+        index_type north_deleted_count,
+        index_type south_deleted_count
     ) :
-    m_entry_mesh(entry_mesh),
-    m_cylinder_count(cylinder_count),
-    m_points_count(points_count),
-    m_segments_count(segments_count),
-    m_side(2 * points_count + cylinder_count)
-    {}
-
-
-public:
-    EdgesMesh(
-        const mesh_points_vector& entry_mesh,
-        MeshProperties prop
-    ) :
+    m_resulted_mesh(resulted_mesh),
     m_entry_mesh(entry_mesh),
     m_cylinder_count(prop.m_cylinder_count),
-    m_points_count(prop.m_points_size),
     m_segments_count(prop.m_segments),
-    m_side(2 * prop.m_points_size + prop.m_cylinder_count)
+    m_side(2 * prop.m_points_size + prop.m_cylinder_count),
+    m_well_offset(m_cylinder_count),
+    m_spherical_offset(m_entry_mesh.size()),
+    m_cylinder_offset(m_cylinder_count * m_segments_count),
+    north_pole_intersected(north_deleted),
+    south_pole_intersected(south_deleted),
+    north_deleted_points(north_deleted_count - north_deleted_count % m_segments_count),
+    south_deleted_points(north_deleted_count - south_deleted_count % m_segments_count)
     {}
 
 public:
@@ -72,16 +64,22 @@ private:
     void create_edges_at_well();
 
 private:
-    void connect_edges_with_well_trajectory();
+    void create_spherical_edges();
 
 private:
-    void connect_polar_nodes();
+    void connect_spreical_points_with_well();
 
 private:
-    void connect_side_nodes();
+    void create_cylinder_sphere_connection(bool north_pole);
 
 private:
-    void connect_segments();
+    void create_edges_cylinder_by_equator_lines();
+
+private:
+    void create_cylinder_longitude_edges();
+
+private:
+    void create_cylidnder_to_mesh_edges();
 };
 
 #include "detail/EdgesMesh.inl"
