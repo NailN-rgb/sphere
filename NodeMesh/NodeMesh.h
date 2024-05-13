@@ -15,6 +15,10 @@ private:
 
 public:
     vector_3d_points m_nodes; // resulted mesh points
+    std::vector<bool> north_deleted;
+    std::vector<bool> south_deleted;
+    vector_of_indexes north_sphere_deleted_count;
+    vector_of_indexes south_sphere_deleted_count;
 
 private:
     point3d pwN; // well north pheel
@@ -44,6 +48,15 @@ public:
         );
 
         create_log_mesh();
+
+        for(index_type i = 0; i < m_prop.m_mesh_count; i++)
+        {
+            north_sphere_deleted_count.push_back(0);
+            south_sphere_deleted_count.push_back(0);
+
+            north_deleted.push_back(false);
+            south_deleted.push_back(false);
+        }
     }
 
 public:
@@ -84,12 +97,22 @@ private:
                 // alpha = atan(dz/dx)
                 auto dx = bg::get<0>(p) - bg::get<0>(pwN);
                 auto dy = bg::get<1>(p) - bg::get<1>(pwN);
-                auto dz = bg::get<2>(p) - bg::get<2>(pwN);
+                auto dz = bg::get<2>(pwN) - bg::get<2>(p);
 
                 auto r_at_xy = std::sqrt(dx * dx + dy * dy);
 
                 auto alpha_angle = std::atan(dy/dx);
-                auto betta_angle = std::atan(r_at_xy/dz);
+
+                value_type betta_angle;
+
+                if(r_at_xy == 0)
+                {
+                    betta_angle = std::atan(1.) * 2;
+                }
+                else
+                {
+                    betta_angle = std::atan(dz/r_at_xy);
+                }
 
                 // loop by log mesh points 
                 for(index_type i = 0; i < m_prop.m_mesh_count; i++)
@@ -101,9 +124,9 @@ private:
 
                         auto ratio_quef = m_log_mesh[i] / dist_from_p_to_pnW;
 
-                        auto newx = bg::get<0>(pwN) - (bg::get<0>(p) - bg::get<0>(pwN)) * ratio_quef;
-                        auto newy = bg::get<1>(pwN) - (bg::get<1>(p) - bg::get<1>(pwN)) * ratio_quef;
-                        auto newz = bg::get<2>(pwN) + (bg::get<2>(p) - bg::get<2>(pwN)) * ratio_quef;
+                        auto newx = bg::get<0>(pwN) + (bg::get<0>(p) - bg::get<0>(pwN)) * ratio_quef;
+                        auto newy = bg::get<1>(pwN) + (bg::get<1>(p) - bg::get<1>(pwN)) * ratio_quef;
+                        auto newz = bg::get<2>(pwN) - (bg::get<2>(pwN) - bg::get<2>(p)) * ratio_quef;
 
                         m_nodes.push_back(bg::make<point3d>(
                             newx,
@@ -113,7 +136,8 @@ private:
                     }
                     else
                     {
-                        m_deleted_points++;
+                        north_deleted[i] = true;
+                        north_sphere_deleted_count[i]++;
                         return;
                     }
                 }
@@ -129,14 +153,23 @@ private:
             {
                 // find direction
                 // alpha = atan(dz/dx)
-                auto dx = bg::get<0>(p) - bg::get<0>(pwN);
-                auto dy = bg::get<1>(p) - bg::get<1>(pwN);
-                auto dz = bg::get<2>(p) - bg::get<2>(pwN);
+                auto dx = bg::get<0>(p) - bg::get<0>(pwS);
+                auto dy = bg::get<1>(p) - bg::get<1>(pwS);
+                auto dz = bg::get<2>(p) + m_prop.m_layer_height - bg::get<2>(pwS);
 
                 auto r_at_xy = std::sqrt(dx * dx + dy * dy);
 
                 auto alpha_angle = std::atan(dy/dx);
-                auto betta_angle = std::atan(r_at_xy/dz);
+                value_type betta_angle;
+
+                if(r_at_xy == 0)
+                {
+                    betta_angle = std::atan(1.) * 2;
+                }
+                else
+                {
+                    betta_angle = std::atan(dz/r_at_xy);
+                }
 
                 // loop by log mesh points 
                 for(index_type i = 0; i < m_prop.m_mesh_count; i++)
@@ -144,23 +177,24 @@ private:
                     // if z projection of logmesh part + pwS.z <= p.Z
                     if(bg::get<2>(pwS) + m_log_mesh[i] * std::sin(betta_angle) <= bg::get<2>(p) + m_prop.m_layer_height)
                     {
-                        auto dist_from_p_to_pwS = bg::distance(pwS, p);
+                        auto dist_from_p_to_pwS = bg::distance(pwS, bg::make<point3d>(p.get<0>(), p.get<1>(), p.get<2>() + m_prop.m_layer_height));
 
                         auto ratio_quef = m_log_mesh[i] / dist_from_p_to_pwS;
 
                         auto newx = bg::get<0>(pwS) + (bg::get<0>(p) - bg::get<0>(pwS)) * ratio_quef;
                         auto newy = bg::get<1>(pwS) + (bg::get<1>(p) - bg::get<1>(pwS)) * ratio_quef;
-                        auto newz = bg::get<2>(pwS) - (bg::get<2>(p) - bg::get<2>(pwS)) * ratio_quef;
+                        auto newz = bg::get<2>(pwS) + (bg::get<2>(p) + m_prop.m_layer_height - bg::get<2>(pwS)) * ratio_quef;
 
                         m_nodes.push_back(bg::make<point3d>(
-                            -newx, // TODO: write about this
-                            -newy,
+                            newx,
+                            newy,
                             newz
                         ));
                     }
                     else
                     {
-                        m_deleted_points++;
+                        south_deleted[i] = true;
+                        south_sphere_deleted_count[i]++;
                         return;
                     }
                 }

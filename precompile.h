@@ -12,6 +12,7 @@
 #include <iostream>
 #include <deque>
 #include <string>
+#include <numeric>
 
 namespace bg = boost::geometry;
 namespace fs = std::experimental::filesystem;

@@ -4,15 +4,37 @@
 #include "../EdgesMesh.h"
 
 void EdgesMesh::calculate_edges_list()
-{
-    // create_edges_at_well();
-    // connect_spreical_points_with_well();
-    // create_spherical_edges();
-    // create_cylinder_sphere_connection(true);
-    // create_edges_cylinder_by_equator_lines();
-    // create_cylinder_longitude_edges();
-    // create_cylidnder_to_mesh_edges();
-    // create_cylinder_sphere_connection(false);
+{   
+    // connect well nodes with each other
+    create_edges_at_well();
+
+    for(index_type i = 0; i < m_mesh_count; i++)
+    {
+        // connect well polar points with nodes at first mesh node
+        connect_spreical_points_with_well_at_north_pole(i);
+        connect_spreical_points_with_well_at_south_pole(i);
+        // connect spherical layers with each other
+        // create_sphere_mesh_connection(i);
+
+        // // connect nodes at spheres
+        // create_spherical_edges(i);
+
+        // //create_cylinder_sphere_connection(true);
+        
+        // // create horizontal directed edges at cylindric part
+        // create_edges_cylinder_by_equator_lines(i);
+
+        // // create edges between cylinder and well
+        // create_cylinder_longitude_edges(i);
+
+        // // create edges betweem well points and cylindric points
+        // create_cylidnder_to_well_edges(i);
+
+        
+        // create_cylinder_sphere_connection(false);
+    }
+
+
     write_edges_to_vtk();
 }
 
@@ -90,7 +112,7 @@ void EdgesMesh::create_edges_at_well()
 {
     edges.reserve(m_cylinder_count); // Preallocate memory to avoid reallocations
 
-    for(index_type i = 0; i < m_cylinder_count; ++i)
+    for(index_type i = 0; i < m_cylinder_count - 1; ++i)
     {
         edges.emplace_back(i, i+1);
     }
@@ -101,39 +123,162 @@ void EdgesMesh::create_edges_at_well()
 /**
  * Connect polar points with well end's
 */
-void EdgesMesh::connect_spreical_points_with_well()
+void EdgesMesh::connect_spreical_points_with_well_at_north_pole(const index_type mesh_layer)
 {
-    edges.reserve(2 * m_entry_mesh.size());
-
-    for(size_t i = m_well_offset, j = 0; j < m_entry_mesh.size(); ++i, ++j)
+    if(mesh_layer == 0)
     {
-        // north pole
-        edges.emplace_back(0, i);
-        // south pole
-        edges.emplace_back(m_well_offset - 1, i + m_spherical_offset);
+        edges.reserve(2 * m_entry_mesh.size());
+        // if there is a intersection at north side of mesh, we create edges from well_nodes_count indexes to end of sphirical mesh part
+        if(north_pole_intersected[mesh_layer])
+        {
+            for(size_t i = 0; i < m_entry_mesh.size() - north_deleted_points[mesh_layer]; ++i)
+            {
+                edges.emplace_back(0, m_well_offset + i);
+            }
+        }
+        else
+        {
+            for(size_t i = m_well_offset; i < m_mesh_count * m_entry_mesh.size(); i += m_mesh_count)
+            {
+                edges.emplace_back(0, i);
+            }
+        }
+    }
+    else
+    {                                                            
+        if(north_pole_intersected[mesh_layer])
+        {
+            for(size_t i = north_deleted_points[mesh_layer]; i < (m_mesh_count - 1) * m_spherical_offset; i += m_mesh_count)
+            {
+                edges.emplace_back(m_well_offset + i, m_well_offset + i + 1);
+            }
+        }
+        else
+        { 
+            // if we dont have intersection at current layer, we dont have it at all of layers before
+            for(size_t i = 0; i < m_mesh_count * m_entry_mesh.size(); i += m_mesh_count)
+            {
+                edges.emplace_back(m_well_offset + i, m_well_offset + i + 1);
+            }
+        }
     }
 }
 
 
-void EdgesMesh::create_spherical_edges()
+void EdgesMesh::connect_spreical_points_with_well_at_south_pole(const index_type mesh_layer)
+{
+    auto south_polar_offset = [this]() // get number of points at north spherical part after intersection
+    {
+        auto north_polar_points = 0;
+        std::for_each(
+            north_deleted_points.begin(),
+            north_deleted_points.end(),
+            [&north_polar_points, this](auto& x) 
+            { 
+                north_polar_points += m_spherical_offset - x;
+            }
+        );
+
+        return north_polar_points - 1;
+    };
+
+    auto deleted_points_at_south_sphere = std::accumulate(south_deleted_points.begin(),
+                                                        south_deleted_points.end(), 0);
+
+    if(mesh_layer == 0)
+    {
+        edges.reserve(2 * m_entry_mesh.size());
+        // if there is a intersection at north side of mesh, we create edges from well_nodes_count indexes to end of sphirical mesh part
+        if(south_pole_intersected[mesh_layer])
+        {
+            for(size_t i = 1; i < m_mesh_count * m_spherical_offset - deleted_points_at_south_sphere; i+=m_mesh_count)
+            {
+                edges.emplace_back(m_well_offset - 1, m_well_offset + south_polar_offset() + i);
+            }
+        }
+        else
+        {
+            for(size_t i = 0; i < m_mesh_count * m_spherical_offset; i += m_mesh_count)
+            {
+                edges.emplace_back(m_well_offset - 1, m_well_offset + south_polar_offset() + i + !north_pole_intersected[mesh_layer]);
+            }
+        }
+    }
+    else
+    {
+        if(south_pole_intersected[mesh_layer])
+        {
+            for(size_t i = south_deleted_points[mesh_layer];
+                i < m_mesh_count * m_spherical_offset - deleted_points_at_south_sphere;
+                i+=m_mesh_count)
+            {
+                edges.emplace_back(m_well_offset + south_polar_offset() + i - 1, 
+                                   m_well_offset + south_polar_offset() + i);
+            }
+        }
+        else
+        { 
+            // if we dont have intersection at current layer, we dont have it at all of layers before
+            for(size_t i = south_deleted_points[mesh_layer]; i < m_mesh_count * m_spherical_offset; i += m_mesh_count)
+            {
+                edges.emplace_back(m_well_offset + i + south_polar_offset()     - !north_pole_intersected[mesh_layer],
+                                   m_well_offset + i + south_polar_offset() + 1 - !north_pole_intersected[mesh_layer]);
+            }
+        }
+    }
+}
+
+
+
+void EdgesMesh::create_spherical_edges(index_type mesh_index)
 {
     auto points_at_segments = m_entry_mesh.size() - m_entry_mesh.size() % m_segments_count;
-    auto points_layers = points_at_segments / m_segments_count;
+    auto points_layers = points_at_segments / m_segments_count; // how much segments
+
+    int deleted_segments_north = north_deleted_points[mesh_index] / m_segments_count + north_pole_intersected[mesh_index]; 
+
+    if(points_layers == deleted_segments_north)
+    {
+        throw std::runtime_error("There no points at polar part");
+    }
 
     // north polar
     // connect with polar node
-    for(index_type i = 0; i < m_segments_count; i++)
+    if(north_pole_intersected[mesh_index])
     {
-        Edge edge;
+        if(north_deleted_points[mesh_index] - m_entry_mesh.size() != 0)
+        {
+            // if there is a intersection we add new polar point instead a north pole 
+            for(index_type i = 0; i < m_segments_count; i++)
+            {
+                auto deleted_mesh_offset = 2 * m_entry_mesh.size();// - north_deleted_points - south_deleted_points;
 
-        edge.set_first(m_well_offset);
-        edge.set_second(m_well_offset + i);
+                Edge edge;
+                
+                edge.set_first(m_well_offset + deleted_mesh_offset + m_cylinder_offset + i - north_deleted_points[mesh_index] + 1);
 
-        edges.push_back(edge);
+                edge.set_second(m_well_offset + i);
+
+                edges.push_back(edge);
+            }
+        }
+    }
+    else
+    {
+        for(index_type i = 0; i < m_segments_count; i++)
+        {
+            Edge edge;
+
+            edge.set_first(m_well_offset);
+
+            edge.set_second(m_well_offset + i);
+
+            edges.push_back(edge);
+        }
     }
 
     // connect points from polar to cylinder part
-    for(index_type i = 0; i < points_layers - 1; i++)
+    for(index_type i = 0; i < points_layers - deleted_segments_north - 1; i++)
     {
         for(index_type j = 0; j < m_segments_count + 1; j++)
         {
@@ -147,7 +292,7 @@ void EdgesMesh::create_spherical_edges()
     }
 
     // conect segments
-    for(index_type i = 0; i < points_layers; i++)
+    for(index_type i = 0; i < points_layers - deleted_segments_north; i++)
     {
         for(index_type j = 0; j < m_segments_count - 1; j++)
         {
@@ -168,51 +313,82 @@ void EdgesMesh::create_spherical_edges()
     }
 
     /*
-        South Pole
+        ---------------------------------------------------------------------------------------------------------------------------------
+        -----------------------------------------SOUTH POLE------------------------------------------------------------------------------
+        ---------------------------------------------------------------------------------------------------------------------------------
     */
 
+    index_type deleted_segments_south = south_deleted_points[mesh_index] / m_segments_count + south_pole_intersected[mesh_index]; 
+
+
     // connect with polar node
-    for(index_type i = 0; i < m_segments_count; i++)
+
+    if(south_pole_intersected[mesh_index])
     {
-        Edge edge;
+        if(south_deleted_points[mesh_index] - m_entry_mesh.size() != 0)
+        {
+            // if there is a intersection we add new polar point instead a north pole 
+            for(index_type i = 0; i < m_segments_count; i++)
+            {
+                auto deleted_mesh_offset = 2 * m_entry_mesh.size() - north_deleted_points[mesh_index] - south_deleted_points[mesh_index];
+                auto north_deleted_offset = m_entry_mesh.size() - north_deleted_points[mesh_index]; // how much points at north pole
 
-        edge.set_first(m_well_offset + m_spherical_offset);
-        edge.set_second(m_well_offset + i + m_spherical_offset);
+                Edge edge;
 
-        edges.push_back(edge);
+                edge.set_first(m_well_offset + deleted_mesh_offset + m_cylinder_offset + m_entry_mesh.size() + (i + 1));
+
+                edge.set_second(m_well_offset + north_deleted_offset + i);
+
+                edges.push_back(edge);
+            }
+        }
     }
-
-    // connect points from polar to cylinder part
-    for(index_type i = 0; i < points_layers - 1; i++)
+    else
     {
-        for(index_type j = 0; j < m_segments_count + 1; j++)
+        for(index_type i = 0; i < m_segments_count; i++)
         {
             Edge edge;
 
-            edge.set_first(m_well_offset + j + i * m_segments_count + m_spherical_offset);
-            edge.set_second(m_well_offset + j + (i + 1) * m_segments_count + m_spherical_offset);
+            edge.set_first(m_well_offset + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
+
+            edge.set_second(m_well_offset + i + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
+
+            edges.push_back(edge);
+        }  
+        
+    }
+
+    // connect points from polar to cylinder part
+    for(index_type i = 0; i < points_layers - deleted_segments_south - 1; i++)
+    {
+        for(index_type j = 0; j < m_segments_count; j++)
+        {
+            Edge edge;
+
+            edge.set_first(m_well_offset + j + i * m_segments_count + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
+            edge.set_second(m_well_offset + j + (i + 1) * m_segments_count + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
             
             edges.push_back(edge);
         }
     }
 
     // conect segments
-    for(index_type i = 0; i < points_layers; i++)
+    for(index_type i = 0; i < points_layers - deleted_segments_south; i++)
     {
         for(index_type j = 0; j < m_segments_count - 1; j++)
         {
             Edge edge;
 
-            edge.set_first(m_well_offset + (j + 1) + i * m_segments_count + m_spherical_offset);
-            edge.set_second(m_well_offset + (j + 2) + i * m_segments_count + m_spherical_offset);
+            edge.set_first(m_well_offset + (j + 1) + i * m_segments_count + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
+            edge.set_second(m_well_offset + (j + 2) + i * m_segments_count + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
             
             edges.push_back(edge);
         }
 
         Edge edge;
 
-        edge.set_first(m_well_offset + m_segments_count + i * m_segments_count + m_spherical_offset);
-        edge.set_second(m_well_offset + i * m_segments_count + 1 + m_spherical_offset);
+        edge.set_first(m_well_offset + m_segments_count + i * m_segments_count + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
+        edge.set_second(m_well_offset + i * m_segments_count + 1 + m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]);
         
         edges.push_back(edge);
     }
@@ -220,9 +396,9 @@ void EdgesMesh::create_spherical_edges()
 }
 
 
-void EdgesMesh::create_cylinder_sphere_connection(bool north_pole)
+void EdgesMesh::create_cylinder_sphere_connection(bool north_pole, index_type mesh_index)
 {
-    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset;
+    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index];
 
     if(north_pole)
     {
@@ -253,9 +429,9 @@ void EdgesMesh::create_cylinder_sphere_connection(bool north_pole)
 }
 
 
-void EdgesMesh::create_edges_cylinder_by_equator_lines()
+void EdgesMesh::create_edges_cylinder_by_equator_lines(index_type mesh_index)
 {
-    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset; // why + 3 ??
+    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]; // why + 3 ??
 
     // connect by segments side
     for(index_type i = 0; i < m_segments_count; i++)
@@ -295,9 +471,9 @@ void EdgesMesh::create_edges_cylinder_by_equator_lines()
 }
 
 
-void EdgesMesh::create_cylinder_longitude_edges()
+void EdgesMesh::create_cylinder_longitude_edges(index_type mesh_index)
 {
-    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset; // why + 3 ??
+    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]; // why + 3 ??
 
     for(index_type i = 0; i < m_segments_count; i++)
     {
@@ -314,9 +490,9 @@ void EdgesMesh::create_cylinder_longitude_edges()
 }
 
 
-void EdgesMesh::create_cylidnder_to_mesh_edges()
+void EdgesMesh::create_cylidnder_to_well_edges(index_type mesh_index)
 {
-    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset; // why + 3 ??
+    auto cylinder_offset = m_well_offset + 2 * m_spherical_offset - north_deleted_points[mesh_index] - south_deleted_points[mesh_index]; // why + 3 ??
 
     for(index_type i = 0; i < m_segments_count; i++)
     {
