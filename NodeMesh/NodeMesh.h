@@ -234,8 +234,8 @@ private:
             {
                 for(index_type k = 0; k < m_prop.m_segments; k++)
                 {
-                    auto x_coord_of_created_point = m_log_mesh[i] * std::cos(k * h_angle + 4 * std::atan(1.)); // to connect with spherical part
-                    auto y_coord_of_created_point = m_log_mesh[i] * std::sin(k * h_angle);
+                    auto x_coord_of_created_point = m_log_mesh[i] * std::cos(k * h_angle); // to connect with spherical part
+                    auto y_coord_of_created_point = m_log_mesh[i] * std::sin(-k * h_angle);
                     auto z_coord_of_created_point = bg::get<2>(pwN) + j * h_at_cyl;
 
                     m_nodes.push_back(
@@ -288,7 +288,8 @@ private:
                     auto x_coord = m_prop.m_max_radius * (dx / std::sqrt(dx * dx + dy * dy));
                     auto y_coord = m_prop.m_max_radius * (dy / std::sqrt(dx * dx + dy * dy));
 
-                    value_type z_coord = compatible_radius * 1 / std::tan(betta_angle);
+                    value_type z_coord = bg::get<2>(pwN) - compatible_radius / std::tan(betta_angle);
+                    // value_type z_coord = compatible_radius * dz / dx;
 
                     m_nodes.push_back(
                         bg::make<point3d>(
@@ -338,7 +339,8 @@ private:
                     auto x_coord = m_prop.m_max_radius * (dx / std::sqrt(dx * dx + dy * dy));
                     auto y_coord = m_prop.m_max_radius * (dy / std::sqrt(dx * dx + dy * dy));
 
-                    value_type z_coord = m_prop.m_layer_height - compatible_radius * 1 / std::tan(betta_angle);
+                    value_type z_coord = bg::get<2>(pwS) + compatible_radius / std::tan(betta_angle);
+
 
                     m_nodes.push_back(
                         bg::make<point3d>(

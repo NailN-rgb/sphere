@@ -65,26 +65,46 @@ public:
 private:
     void create_edges_at_well();
 
-private:
-    void create_spherical_edges(index_type i);
+private: 
+    void create_cylinder_nodes(index_type mesh_index);
 
 private:
-    void connect_spreical_points_with_well_at_north_pole(index_type i);
+    void connect_spherical_points_with_well_at_north_pole(index_type layer);
 
 private:
-    void connect_spreical_points_with_well_at_south_pole(index_type i);
+    void connect_spreical_points_with_well_at_south_pole(index_type mesh_index);
 
 private:
-    void create_cylinder_sphere_connection(bool north_pole, index_type i);
+    void create_cylinder_sphere_connection(bool north_pole, index_type mesh_index);
 
 private:
-    void create_edges_cylinder_by_equator_lines(index_type i);
+    void create_spherical_edges_at_north_pole(index_type mesh_index);
 
 private:
-    void create_cylinder_longitude_edges(index_type i);
+    void create_spherical_edges_at_south_pole(index_type mesh_index); 
 
 private:
-    void create_cylidnder_to_well_edges(index_type i);
+    void create_edges_cylinder_by_equator_lines(index_type mesh_index);
+
+private:
+    void create_cylinder_longitude_edges(index_type mesh_index);
+
+private:
+    void create_cylidnder_to_well_edges(index_type mesh_index);
+
+private:
+    void create_outer_mesh_edges_at_north();
+
+private:
+    void create_outer_mesh_edges_at_south();
+
+
+// Utils
+
+private:
+    index_type get_number_of_spherical_points();
+    index_type total_deleted_points_north();
+    index_type total_deleted_points_south();
 };
 
 #include "detail/EdgesMesh.inl"
