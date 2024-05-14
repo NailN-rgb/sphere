@@ -158,7 +158,10 @@ void EdgesMesh::connect_spreical_points_with_well_at_north_pole(const index_type
             // if we dont have intersection at current layer, we dont have it at all of layers before
             for(size_t i = 0; i < m_mesh_count * m_entry_mesh.size(); i += m_mesh_count)
             {
-                edges.emplace_back(m_well_offset + i, m_well_offset + i + 1);
+                for(size_t j = 0; j < m_mesh_count - 1; j++)
+                {
+                    edges.emplace_back(m_well_offset + j + i, m_well_offset + i + j + 1);
+                }
             }
         }
     }
@@ -219,10 +222,16 @@ void EdgesMesh::connect_spreical_points_with_well_at_south_pole(const index_type
         else
         { 
             // if we dont have intersection at current layer, we dont have it at all of layers before
-            for(size_t i = south_deleted_points[mesh_layer]; i < m_mesh_count * m_spherical_offset; i += m_mesh_count)
+            for(size_t i = 0; i < m_mesh_count * m_spherical_offset; i += m_mesh_count)
             {
-                edges.emplace_back(m_well_offset + i + south_polar_offset()     - !north_pole_intersected[mesh_layer],
-                                   m_well_offset + i + south_polar_offset() + 1 - !north_pole_intersected[mesh_layer]);
+                // edges.emplace_back(m_well_offset + i + south_polar_offset()     - !north_pole_intersected[mesh_layer],
+                //                    m_well_offset + i + south_polar_offset() + 1 - !north_pole_intersected[mesh_layer]);
+
+                for(size_t j = 0; j < m_mesh_count - 1; j++)
+                {
+                    edges.emplace_back(m_well_offset + south_polar_offset() + i + j + 1,
+                                       m_well_offset + south_polar_offset() + i + j + 2);
+                }
             }
         }
     }
