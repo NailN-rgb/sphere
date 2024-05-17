@@ -13,6 +13,21 @@ index_type EdgesMesh::total_deleted_points_north()
 }
 
 
+index_type EdgesMesh::total_deleted_points_to_layer(index_type mesh_layer)
+{
+    auto deleted_count = 0;
+    
+    for(index_type i = 0; i < mesh_layer + 1; i++)
+    {
+        deleted_count += north_deleted_points[i] + south_deleted_points[i];
+    }
+
+    return deleted_count;
+}
+
+// Method to get number of deleted points to this mesh layer
+
+
 index_type EdgesMesh::total_deleted_points_south()
 {
     return std::accumulate(

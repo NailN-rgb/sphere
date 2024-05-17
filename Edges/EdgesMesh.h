@@ -105,6 +105,7 @@ private:
     index_type get_number_of_spherical_points();
     index_type total_deleted_points_north();
     index_type total_deleted_points_south();
+    index_type total_deleted_points_to_layer(index_type mesh_layer);
 };
 
 #include "detail/EdgesMesh.inl"
