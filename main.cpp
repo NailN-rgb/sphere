@@ -8,7 +8,7 @@
 int main()
 {
     value_type zw               = 5;
-    value_type lw               = 1;
+    value_type lw               = 0.5;
     value_type circle_radius    = 1;
     value_type layer_height     = 10;
     vector_of_points lgr_points {point(1,0), point(2,0)}; //{point(1,0), point(2,0), point(3,0), point(4,0), point(5,0), point(6,0), point(7,0), point(8,0), point(20,0), point(50,0)};   // { point(1,0), point(2,0), point(3,0), point(4,0)};

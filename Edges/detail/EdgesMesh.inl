@@ -12,14 +12,14 @@ void EdgesMesh::calculate_edges_list()
     for(index_type i = 0; i < m_mesh_count; i++)
     {
         // connect well polar points with nodes at first mesh node
-        connect_spherical_points_with_well_at_north_pole(i);
-        connect_spreical_points_with_well_at_south_pole(i);
+        //connect_spherical_points_with_well_at_north_pole(i);
+        //connect_spreical_points_with_well_at_south_pole(i);
 
         // connect nodes at spheres
         create_spherical_edges_at_north_pole(i);
         create_spherical_edges_at_south_pole(i);
 
-        create_cylinder_edges(i);
+        //create_cylinder_edges(i);
     }
 
     // create_outer_mesh_edges_at_north();
@@ -423,250 +423,145 @@ void EdgesMesh::create_spherical_edges_at_south_pole(index_type mesh_index)
 
 void EdgesMesh::create_outer_mesh_edges_at_north()
 {
-    if(total_deleted_points_to_layer_north(m_mesh_count - 1) != 0)
+    // we need to find index of outer mesh start point,
+    // connect "outer" lgr layer with outer mesh
+    // then connect outer mesh with each other
+
+    // -to outer mesh nodes offset
+    auto outer_north_offset = m_well_offset + 2 * m_mesh_count * m_spherical_offset + m_mesh_count * m_cylinder_offset  
+                                                    - total_deleted_points_north(m_mesh_count) - total_deleted_points_south(m_mesh_count);
+
+    // connect lgr nodes with outer mesh nodes.
+    // get number of segment layers at last lgr mesh
+    auto radial_layers_count = (m_spherical_offset - north_deleted_points[m_mesh_count - 1]) / m_segments_count;
+
+    for(index_type i = 0; i < radial_layers_count; i++)
     {
-        auto outer_mesh_offset = m_well_offset + m_mesh_count * (2 * m_spherical_offset + m_cylinder_count * m_segments_count)
-                                                                                 - total_deleted_points_to_layer_north(m_mesh_count - 1);    
-        auto points_at_segments = (m_spherical_offset - 1) / m_segments_count;
-
-        // first step: connect lgr with outer nodes
-        for(index_type i = 0; i < m_spherical_offset - total_deleted_points_to_layer_north(m_mesh_count - 1); i++)
+        for(index_type j = 0; j < m_segments_count; j++)
         {
             edges.emplace_back(
-                outer_mesh_offset + i,
-                m_well_offset + (i + 1)* m_mesh_count - 1 - north_pole_intersected[m_mesh_count - 1]
-            );
-        }
-
-        // Second step: connect outer mesh nodes with edges from polar point(0,0,0) to cylinder part of mesh
-
-        // connect polar part of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            edges.emplace_back(
-                outer_mesh_offset,
-                outer_mesh_offset + i
-            );
-        }
-
-        // connect onder radial parts of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            for(index_type j = 0; j < points_at_segments - 1; j++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset + j * m_segments_count + i,
-                    outer_mesh_offset + (j + 1) * m_segments_count + i
-                );
-            }
-        }
-
-        // Third step: connect outer mesh points by circles
-
-        for(index_type j = 0; j < points_at_segments; j++)
-        {
-            for(index_type i = 0; i < m_segments_count - 1; i++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset + j  + i * m_segments_count + 1,
-                    outer_mesh_offset + (j + 1) + i * m_segments_count + 1
-                );
-            }
-
-            edges.emplace_back(
-                outer_mesh_offset + j * m_segments_count + 1,
-                outer_mesh_offset + m_segments_count - 1 + 1 + j * m_segments_count
+                outer_north_offset + north_deleted_points[m_mesh_count - 1] + j + i * m_segments_count,
+                m_well_offset + m_mesh_count * m_spherical_offset - total_deleted_points_north(m_mesh_count) - radial_layers_count * m_segments_count + j + i * m_segments_count
             );
         }
     }
-    else
+
+    // outer mesh points connectioon
+
+    // connect by polar 
+
+    for(index_type i = 1; i < m_segments_count + 1; i++)
     {
-        /*
-            In case when intersection point list is empty:
+        edges.emplace_back(
+            outer_north_offset,
+            outer_north_offset + i
+        );
+    }
 
-            first we need to connect last lgr layer with outer mesh nodes
-            index of first outer node may be found like
-            idx = (2 * m_spherical_offset + m_cylinder_count * m_segments_count) * m_mesh_count
-            
-            Numeration of outer nodes is similar to numeration at entry points cloud. Here we 
-            must create a code like a connection of lgr layers
+    auto points_at_segments = (m_spherical_offset - 1) / m_segments_count;
 
-            Next step connect 'neareset' points. This algorithm is similar to connection of points at 2D case(?). 
-        */
-
-        auto outer_mesh_offset = (2 * m_spherical_offset + m_cylinder_count * m_segments_count) * m_mesh_count + m_well_offset;
-        auto points_at_segments = (m_spherical_offset - 1) / m_segments_count;
-
-        // first step: connett lg with outer nodes
-        for(index_type i = 0; i < m_spherical_offset; i++)
+    // connect onder radial parts of mesh
+    for(index_type i = 1; i < m_segments_count + 1; i++)
+    {
+        for(index_type j = 0; j < points_at_segments - 1; j++)
         {
-
             edges.emplace_back(
-                outer_mesh_offset + i,
-                m_well_offset + (i + 1)* m_mesh_count - 1
+                outer_north_offset + j * m_segments_count + i,
+                outer_north_offset + (j + 1) * m_segments_count + i
+            );
+        }
+    }
+
+
+    // Third step: connect outer mesh points by circles
+
+    for(index_type j = 0; j < points_at_segments; j++)
+    {
+        for(index_type i = 0; i < m_segments_count - 1; i++)
+        {
+            edges.emplace_back(
+                outer_north_offset + j  + i * m_segments_count + 1,
+                outer_north_offset + (j + 1) + i * m_segments_count + 1
             );
         }
 
-        // Second step: connect outer mesh nodes with edges from polar point(0,0,0) to cylinder part of mesh
-
-        // connect polar part of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            edges.emplace_back(
-                outer_mesh_offset,
-                outer_mesh_offset + i
-            );
-        }
-
-        // connect onder radial parts of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            for(index_type j = 0; j < points_at_segments - 1; j++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset + j * m_segments_count + i,
-                    outer_mesh_offset + (j + 1) * m_segments_count + i
-                );
-            }
-        }
-
-        // Third step: connect outer mesh points by circles
-
-        for(index_type j = 0; j < points_at_segments; j++)
-        {
-            for(index_type i = 0; i < m_segments_count - 1; i++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset + j  + i * m_segments_count + 1,
-                    outer_mesh_offset + (j + 1) + i * m_segments_count + 1
-                );
-            }
-
-            edges.emplace_back(
-                outer_mesh_offset + j * m_segments_count + 1,
-                outer_mesh_offset + m_segments_count - 1 + 1 + j * m_segments_count
-            );
-        }
+        edges.emplace_back(
+            outer_north_offset + j * m_segments_count + 1,
+            outer_north_offset + m_segments_count - 1 + 1 + j * m_segments_count
+        );
     }
 }
 
 
 void EdgesMesh::create_outer_mesh_edges_at_south()
 {
-    index_type total_north_sphere_offset = m_well_offset + m_mesh_count * m_spherical_offset - total_deleted_points_north();
+    // we need to find index of outer mesh start point,
+    // connect "outer" lgr layer with outer mesh
+    // then connect outer mesh with each other
 
-    if(total_deleted_points_to_layer_north(m_mesh_count - 1))
+    // -to outer mesh nodes offset
+    auto outer_south_offset = m_well_offset + 2 * m_mesh_count * m_spherical_offset + m_mesh_count * m_cylinder_offset  
+                                                    - total_deleted_points_north(m_mesh_count) - total_deleted_points_south(m_mesh_count) + m_spherical_offset;
+
+    // connect lgr nodes with outer mesh nodes.
+    // get number of segment layers at last lgr mesh
+    auto radial_layers_count = (m_spherical_offset - south_deleted_points[m_mesh_count - 1]) / m_segments_count;
+
+    for(index_type i = 0; i < radial_layers_count; i++)
     {
-        auto outer_mesh_offset = m_well_offset + m_mesh_count * (3 * m_spherical_offset + m_cylinder_count * m_segments_count) 
-                                                                                - total_deleted_points_to_layer_north(m_mesh_count - 1);    
-        auto points_at_segments = (m_spherical_offset - 1) / m_segments_count;
-
-        // first step: connect lgr with outer nodes
-        for(index_type i = 0; i < m_spherical_offset - total_deleted_points_to_layer_north(m_mesh_count - 1); i++)
+        for(index_type j = 0; j < m_segments_count; j++)
         {
             edges.emplace_back(
-                outer_mesh_offset + i + south_pole_intersected[m_mesh_count - 1],
-                // for one mesh layer only
-                m_well_offset + m_spherical_offset * m_mesh_count - total_deleted_points_to_layer_north(m_mesh_count - 1) + (i + 1) * m_mesh_count - !south_pole_intersected[m_mesh_count -1]
-            );
-        }
-
-        // Second step: connect outer mesh nodes with edges from polar point(0,0,h) to cylinder part of mesh
-
-        // connect polar part of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            edges.emplace_back(
-                outer_mesh_offset,
-                outer_mesh_offset + i
-            );
-        }
-
-        // connect onder radial parts of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            for(index_type j = 0; j < points_at_segments - 1; j++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset + j * m_segments_count + i,
-                    outer_mesh_offset + (j + 1) * m_segments_count + i
-                );
-            }
-        }
-
-        // Third step: connect outer mesh points by circles
-
-        for(index_type j = 0; j < points_at_segments; j++)
-        {
-            for(index_type i = 0; i < m_segments_count - 1; i++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset + j  + i * m_segments_count + 1,
-                    outer_mesh_offset + (j + 1) + i * m_segments_count + 1
-                );
-            }
-
-            edges.emplace_back(
-                outer_mesh_offset + j * m_segments_count + 1,
-                outer_mesh_offset + m_segments_count - 1 + 1 + j * m_segments_count
+                outer_south_offset + south_deleted_points[m_mesh_count - 1] + j + i * m_segments_count,
+                m_well_offset + 2 * m_mesh_count * m_spherical_offset - total_deleted_points_north(m_mesh_count) - total_deleted_points_south(m_mesh_count)
+                                                                                             - radial_layers_count * m_segments_count + j + i * m_segments_count
             );
         }
     }
-    else
+
+    // outer mesh points connectioon
+
+    // connect by polar 
+
+    for(index_type i = 1; i < m_segments_count + 1; i++)
     {
-        auto outer_mesh_offset_south = (2 * m_spherical_offset + m_cylinder_count * m_segments_count) * m_mesh_count + m_well_offset + m_spherical_offset;
-        auto points_at_segments = (m_spherical_offset - 1) / m_segments_count;
+        edges.emplace_back(
+            outer_south_offset,
+            outer_south_offset + i
+        );
+    }
 
-        // first step: connett lg with outer nodes
-        for(index_type i = 0; i < m_spherical_offset; i++)
+    auto points_at_segments = (m_spherical_offset - 1) / m_segments_count;
+
+    // connect onder radial parts of mesh
+    for(index_type i = 1; i < m_segments_count + 1; i++)
+    {
+        for(index_type j = 0; j < points_at_segments - 1; j++)
         {
-
             edges.emplace_back(
-                outer_mesh_offset_south + i,
-                total_north_sphere_offset + (i + 1)* m_mesh_count - 1
+                outer_south_offset + j * m_segments_count + i,
+                outer_south_offset + (j + 1) * m_segments_count + i
+            );
+        }
+    }
+
+
+    // Third step: connect outer mesh points by circles
+
+    for(index_type j = 0; j < points_at_segments; j++)
+    {
+        for(index_type i = 0; i < m_segments_count - 1; i++)
+        {
+            edges.emplace_back(
+                outer_south_offset + j  + i * m_segments_count + 1,
+                outer_south_offset + (j + 1) + i * m_segments_count + 1
             );
         }
 
-        // Second step: connect outer mesh nodes with edges from polar point(0,0,0) to cylinder part of mesh
-
-        // connect polar part of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            edges.emplace_back(
-                outer_mesh_offset_south,
-                outer_mesh_offset_south + i
-            );
-        }
-
-        // connect onder radial parts of mesh
-        for(index_type i = 1; i < m_segments_count + 1; i++)
-        {
-            for(index_type j = 0; j < points_at_segments - 1; j++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset_south + j * m_segments_count + i,
-                    outer_mesh_offset_south + (j + 1) * m_segments_count + i
-                );
-            }
-        }
-
-        // Third step: connect outer mesh points by circles
-
-        for(index_type j = 0; j < points_at_segments; j++)
-        {
-            for(index_type i = 0; i < m_segments_count - 1; i++)
-            {
-                edges.emplace_back(
-                    outer_mesh_offset_south + j  + i * m_segments_count + 1,
-                    outer_mesh_offset_south + (j + 1) + i * m_segments_count + 1
-                );
-            }
-
-            edges.emplace_back(
-                outer_mesh_offset_south + j * m_segments_count + 1,
-                outer_mesh_offset_south + m_segments_count - 1 + 1 + j * m_segments_count
-            );
-        }
+        edges.emplace_back(
+            outer_south_offset + j * m_segments_count + 1,
+            outer_south_offset + m_segments_count - 1 + 1 + j * m_segments_count
+        );
     }
 }
 
