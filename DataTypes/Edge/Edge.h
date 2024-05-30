@@ -16,10 +16,7 @@ public:
     ): m_first(first), m_second(second)
     {}
 
-    Edge()
-    {
-        
-    };
+    Edge() = default;
 
 public:
     void set_first(index_type first);

@@ -10,7 +10,6 @@
 class EdgesMesh
 {
     using edges_list = std::vector<Edge>;
-
 private:
     mesh_points_vector m_entry_mesh;
     mesh_points_vector m_resulted_mesh;
@@ -41,28 +40,28 @@ public:
 
 public:
     EdgesMesh(
-        const mesh_points_vector& resulted_mesh,
-        MeshProperties prop,
-        const mesh_points_vector& entry_mesh,
-        std::vector<bool> north_deleted, // TODO: create struct for this datas
-        std::vector<bool> south_deleted,
-        vector_of_indexes north_deleted_count,
-        vector_of_indexes south_deleted_count,
-        vector_of_indexes north_pole_depth,
-        vector_of_indexes south_pole_depth
+        mesh_points_vector const& resulted_mesh,
+        MeshProperties const& prop,
+        mesh_points_vector const& entry_mesh,
+        std::vector<bool> const& north_deleted, // TODO: create struct for this datas
+        std::vector<bool> const& south_deleted,
+        vector_of_indexes const& north_deleted_count,
+        vector_of_indexes const& south_deleted_count,
+        vector_of_indexes const& north_pole_depth,
+        vector_of_indexes const& south_pole_depth
     ) :
-    m_resulted_mesh(resulted_mesh),
     m_entry_mesh(entry_mesh),
+    m_resulted_mesh(resulted_mesh),
     m_cylinder_count(prop.m_cylinder_count),
     m_segments_count(prop.m_segments),
-    m_mesh_count(prop.m_mesh_count),
-    m_side(2 * prop.m_points_size + prop.m_cylinder_count),
+    m_side(static_cast<index_type>(2 * prop.m_points_size + prop.m_cylinder_count)),
     m_well_offset(m_cylinder_count),
-    m_spherical_offset(m_entry_mesh.size()),
+    m_spherical_offset(static_cast<index_type>(m_entry_mesh.size())),
     m_cylinder_offset(m_cylinder_count * m_segments_count),
+    m_mesh_count(prop.m_mesh_count),
     north_pole_intersected(north_deleted),
-    south_pole_intersected(south_deleted),
     north_deleted_points(north_deleted_count),
+    south_pole_intersected(south_deleted),
     south_deleted_points(south_deleted_count),
     north_pole_points_depth(north_pole_depth),
     south_pole_points_depth(south_pole_depth)
@@ -111,8 +110,6 @@ private:
 
 private:
     void create_outer_mesh_edges_at_south();
-
-
 
 // Utils
 

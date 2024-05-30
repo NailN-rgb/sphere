@@ -12,8 +12,8 @@ void EdgesMesh::calculate_edges_list()
     for(index_type i = 0; i < m_mesh_count; i++)
     {
         // connect well polar points with nodes at first mesh node
-        //connect_spherical_points_with_well_at_north_pole(i);
-        //connect_spreical_points_with_well_at_south_pole(i);
+        connect_spherical_points_with_well_at_north_pole(i);
+        connect_spreical_points_with_well_at_south_pole(i);
 
         // connect nodes at spheres
         create_spherical_edges_at_north_pole(i);
@@ -138,7 +138,7 @@ void EdgesMesh::connect_spherical_points_with_well_at_north_pole(const index_typ
         // if there is a intersection at north side of mesh, we create edges from well_nodes_count indexes to end of sphirical mesh part
         for(size_t i = 0; i < m_spherical_offset - north_deleted_points[mesh_layer]; i++)
         {
-            edges.emplace_back(0, m_well_offset + i);
+            edges.emplace_back(0, m_well_offset + i - 1);
         }
         
     }

@@ -11,7 +11,7 @@ private:
     vector_of_indexes m_points;
 
 public:
-    Element(
+    explicit Element(
         index_type element_size
     ) :
     m_element_size(element_size)
@@ -31,7 +31,7 @@ public:
     };
 
 public:
-    vector_of_indexes get_element()
+    vector_of_indexes get_element() const
     {
         if(m_points.size() > 0)
         {
@@ -44,7 +44,7 @@ public:
     }
 
 public:
-    index_type get_element_size()
+    index_type get_element_size() const
     {
         return m_element_size;
     }
