@@ -28,6 +28,14 @@ private:
     std::vector<bool> south_pole_intersected;
     vector_of_indexes south_deleted_points;
 
+private:
+    vector_of_indexes north_pole_points_depth;
+    vector_of_indexes south_pole_points_depth;
+
+private:
+    vector_of_indexes north_pole_radia_count;
+    vector_of_indexes south_pole_radia_count;
+
 public:
     edges_list edges;
 
@@ -39,7 +47,9 @@ public:
         std::vector<bool> north_deleted, // TODO: create struct for this datas
         std::vector<bool> south_deleted,
         vector_of_indexes north_deleted_count,
-        vector_of_indexes south_deleted_count
+        vector_of_indexes south_deleted_count,
+        vector_of_indexes north_pole_depth,
+        vector_of_indexes south_pole_depth
     ) :
     m_resulted_mesh(resulted_mesh),
     m_entry_mesh(entry_mesh),
@@ -53,8 +63,12 @@ public:
     north_pole_intersected(north_deleted),
     south_pole_intersected(south_deleted),
     north_deleted_points(north_deleted_count),
-    south_deleted_points(south_deleted_count)
-    {}
+    south_deleted_points(south_deleted_count),
+    north_pole_points_depth(north_pole_depth),
+    south_pole_points_depth(south_pole_depth)
+    {
+        get_spherical_radial_count();
+    }
 
 public:
     void calculate_edges_list();
@@ -66,7 +80,7 @@ private:
     void create_edges_at_well();
 
 private: 
-    void create_cylinder_nodes(index_type mesh_index);
+    void create_cylinder_edges(index_type mesh_index);
 
 private:
     void connect_spherical_points_with_well_at_north_pole(index_type layer);
@@ -99,13 +113,17 @@ private:
     void create_outer_mesh_edges_at_south();
 
 
+
 // Utils
 
 private:
     index_type get_number_of_spherical_points();
-    index_type total_deleted_points_north();
+    index_type total_deleted_points_north(index_type mesh_layer = 0);
+    index_type total_deleted_points_south(index_type mesh_layer = 0);
     index_type total_deleted_points_south();
-    index_type total_deleted_points_to_layer(index_type mesh_layer);
+    index_type total_deleted_points_to_layer_north(index_type mesh_layer);
+    void get_spherical_radial_count();
+
 };
 
 #include "detail/EdgesMesh.inl"

@@ -20,6 +20,10 @@ public:
     vector_of_indexes north_sphere_deleted_count;
     vector_of_indexes south_sphere_deleted_count;
 
+public:
+    vector_of_indexes north_pole_points_depth;
+    vector_of_indexes south_pole_points_depth;
+
 private:
     point3d pwN; // well north pheel
     point3d pwS; // well south pheel
@@ -57,6 +61,9 @@ public:
             north_deleted.push_back(false);
             south_deleted.push_back(false);
         }
+
+        north_pole_points_depth.reserve(m_entry_2d_mesh.size());
+        south_pole_points_depth.reserve(m_entry_2d_mesh.size());
     }
 
 public:
@@ -87,36 +94,39 @@ private:
 private:
     void create_semisphere_points()
     {           
-        // create 3d segment
-        std::for_each(
-            m_entry_2d_mesh.begin(),
-            m_entry_2d_mesh.end(),
-            [this](point3d p)
-            {
-                // find direction
-                // alpha = atan(dz/dx)
-                auto dx = bg::get<0>(p) - bg::get<0>(pwN);
-                auto dy = bg::get<1>(p) - bg::get<1>(pwN);
-                auto dz = bg::get<2>(pwN) - bg::get<2>(p);
-
-                auto r_at_xy = std::sqrt(dx * dx + dy * dy);
-
-                auto alpha_angle = std::atan(dy/dx);
-
-                value_type betta_angle;
-
-                if(r_at_xy == 0)
+        // loop by log mesh points 
+        for(index_type i = 0; i < m_prop.m_mesh_count; i++)
+        {
+            // create 3d segment
+            std::for_each(
+                m_entry_2d_mesh.begin(),
+                m_entry_2d_mesh.end(),
+                [this, i](point3d p)
                 {
-                    betta_angle = std::atan(1.) * 2;
-                }
-                else
-                {
-                    betta_angle = std::atan(dz/r_at_xy);
-                }
+                    // find direction
+                    // alpha = atan(dz/dx)
+                    auto dx = bg::get<0>(p) - bg::get<0>(pwN);
+                    auto dy = bg::get<1>(p) - bg::get<1>(pwN);
+                    auto dz = bg::get<2>(pwN) - bg::get<2>(p);
 
-                // loop by log mesh points 
-                for(index_type i = 0; i < m_prop.m_mesh_count; i++)
-                {
+                    auto r_at_xy = std::sqrt(dx * dx + dy * dy);
+
+                    auto alpha_angle = std::atan(dy/dx);
+
+                    value_type betta_angle;
+
+                    if(r_at_xy == 0)
+                    {
+                        betta_angle = std::atan(1.) * 2;
+                    }
+                    else
+                    {
+                        betta_angle = std::atan(dz/r_at_xy);
+                    }
+
+                    north_pole_points_depth.push_back(0);
+
+                    
                     // if z projection of logmesh part + pwN.z <= p.Z
                     if(bg::get<2>(pwN) - m_log_mesh[i] * std::sin(betta_angle) >= bg::get<2>(p)) // bg::get 2 (p) is 0 
                     {
@@ -133,47 +143,52 @@ private:
                             newy,
                             newz
                         ));
+
+                        north_pole_points_depth.back() = i;        
                     }
                     else
                     {
                         north_deleted[i] = true;
-                        north_sphere_deleted_count[i]++;
+                        north_sphere_deleted_count[i]++;;
+                        north_pole_points_depth.back() = i;
                         return;
                     }
                 }
-            }
-        );
+                
+            );
+        }
 
         // create downside part of mesh
-
-        std::for_each(
-            m_entry_2d_mesh.begin(),
-            m_entry_2d_mesh.end(),
-            [this](point3d p)
-            {
-                // find direction
-                // alpha = atan(dz/dx)
-                auto dx = bg::get<0>(p) - bg::get<0>(pwS);
-                auto dy = bg::get<1>(p) - bg::get<1>(pwS);
-                auto dz = bg::get<2>(p) + m_prop.m_layer_height - bg::get<2>(pwS);
-
-                auto r_at_xy = std::sqrt(dx * dx + dy * dy);
-
-                auto alpha_angle = std::atan(dy/dx);
-                value_type betta_angle;
-
-                if(r_at_xy == 0)
+        
+        // loop by log mesh points 
+        for(index_type i = 0; i < m_prop.m_mesh_count; i++)
+        {
+            std::for_each(
+                m_entry_2d_mesh.begin(),
+                m_entry_2d_mesh.end(),
+                [this, i](point3d p)
                 {
-                    betta_angle = std::atan(1.) * 2;
-                }
-                else
-                {
-                    betta_angle = std::atan(dz/r_at_xy);
-                }
+                    // find direction
+                    // alpha = atan(dz/dx)
+                    auto dx = bg::get<0>(p) - bg::get<0>(pwS);
+                    auto dy = bg::get<1>(p) - bg::get<1>(pwS);
+                    auto dz = bg::get<2>(p) + m_prop.m_layer_height - bg::get<2>(pwS);
 
-                // loop by log mesh points 
-                for(index_type i = 0; i < m_prop.m_mesh_count; i++)
-                {
+                    auto r_at_xy = std::sqrt(dx * dx + dy * dy);
+
+                    auto alpha_angle = std::atan(dy/dx);
+                    value_type betta_angle;
+
+                    if(r_at_xy == 0)
+                    {
+                        betta_angle = std::atan(1.) * 2;
+                    }
+                    else
+                    {
+                        betta_angle = std::atan(dz/r_at_xy);
+                    }
+
+                    
                     // if z projection of logmesh part + pwS.z <= p.Z
                     if(bg::get<2>(pwS) + m_log_mesh[i] * std::sin(betta_angle) <= bg::get<2>(p) + m_prop.m_layer_height)
                     {
@@ -197,11 +212,10 @@ private:
                         south_sphere_deleted_count[i]++;
                         return;
                     }
-                }
-            }
-        );
+                    }
+            );
+        }
     }
-
 
 private:
     void create_well_nodes()
