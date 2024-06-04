@@ -6,14 +6,15 @@
 #include "../../DataTypes/Element/Element.h"
 #include "../../MeshProperties/MeshProperties.h"
 
-class SphericalElems
+class OuterElems
 {
     using edges_list = std::vector<Edge>;
     using elems_list = std::vector<Element>;
 private:
     edges_list m_edges;
     index_type m_to_sphere_offset;
-    vector_of_indexes m_deleted_nodes;
+    vector_of_indexes m_north_deleted;
+    vector_of_indexes m_south_deleted;
     MeshProperties m_prop;
 
 private:
@@ -26,11 +27,13 @@ private:
 
     index_type m_well_node;
 
+    index_type m_outer_nodes_offset;
+
 private:
     elems_list m_elems;
 
 public:
-    SphericalElems(
+    OuterElems(
         edges_list const& edges,
         index_type to_sphere_offset,
         vector_of_indexes const& deleted_nodes,
@@ -46,17 +49,17 @@ public:
     m_spherical_offset(spherical_offset),
     is_north_pole(north_pole)
     {
-        get_spheric_elems();
+        get_outer_elems();
     }
 
 private:
-    void get_spheric_elems();
+    void get_outer_elems();
 
 private:
-    void get_unintersected_sphere_elems(size_t intersected_spheres);
+    void get_north_outer_elems(size_t intersected_spheres);
 
 private:
-    void get_intersected_sphere_elems(size_t intersected_spheres);
+    void get_south_outer_elems(size_t intersected_spheres);
 
 private:
     void get_property_fields();

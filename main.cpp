@@ -8,14 +8,14 @@
 
 int main()
 {
-    value_type zw               = 6;
+    value_type zw               = 5;
     value_type lw               = 0.5;
     value_type circle_radius    = 1;
     value_type layer_height     = 10;
     vector_of_points lgr_points {point(1,0), point(2,0)}; //{point(1,0), point(2,0), point(3,0), point(4,0), point(5,0), point(6,0), point(7,0), point(8,0), point(20,0), point(50,0)};   // { point(1,0), point(2,0), point(3,0), point(4,0)};
     index_type segments         = 12; // > = 3  !!
     index_type cylinder_count   = 5;
-    index_type mesh_count       = 3;
+    index_type mesh_count       = 4;
     value_type max_radius       = 15.0636;
     fs::path path_to_2d_mesh    = "../data/mesh.txt";
 
@@ -57,7 +57,8 @@ int main()
         mesh_read.get_points_list(),
         mp,
         node_mesh.north_sphere_deleted_count, 
-        node_mesh.south_sphere_deleted_count
+        node_mesh.south_sphere_deleted_count,
+        node_mesh.m_nodes
     );
 
     return 0;
